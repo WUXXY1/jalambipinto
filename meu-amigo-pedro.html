@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu amigo PEDRO o homeless - Jalambi Pinto Movies</title>
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="images/favicon.ico">
+    <link rel="icon" sizes="64x64" href="images/favicon.ico">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/movie-detail.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <style>
+        /* Estilos para o Easter Egg */
+        .milk-particle-image {
+            position: fixed;
+            width: 120px;  /* TAMANHO BASE - A escala aleatória será aplicada a este tamanho */
+            height: auto;
+            pointer-events: none;
+            z-index: 10000;
+            opacity: 0;
+            will-change: transform, opacity;
+        }
+
+        body.easter-egg-active > header,
+        body.easter-egg-active > section,
+        body.easter-egg-active > footer,
+        body.easter-egg-active > button#mute-button {
+            transition: opacity 0.3s ease-out !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+        }
+
+        body.easter-egg-active {
+            background-color: #0c0c0c !important;
+            overflow: hidden !important;
+        }
+
+        #pedro-trigger-word {
+            cursor: pointer;
+            user-select: none;
+            display: inline-block;
+        }
+        #pedro-trigger-word:hover {
+            text-shadow: 0 0 5px var(--primary-color);
+        }
+    </style>
+</head>
+<body>
+    <!-- O restante do seu HTML (header, sections, footer) permanece o mesmo -->
+    <header>
+        <div class="container">
+            <div class="logo-container">
+                <img src="images/JLMB logo.png" alt="Jalambi pinto Logo">
+                <h1 class="site-title">Jalambi Pinto Movies</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html" class="nav-item">Home</a></li>
+                    <li><a href="index.html#filmes" class="nav-item">Filmes</a></li>
+                    <li><a href="index.html#proximos" class="nav-item">Próximos</a></li>
+                    <li><a href="index.html#sobre" class="nav-item">Sobre</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="movie-detail">
+        <div class="container">
+            <div class="movie-detail-content">
+                <div class="movie-poster">
+                    <img src="images/meu_amigo_pedro_o_homeless.png" alt="Meu amigo PEDRO o homeless">
+                </div>
+                <div class="movie-info-detail">
+                    <h2>Meu amigo <span id="pedro-trigger-word">PEDRO</span> o homeless</h2>
+                    <div class="movie-meta">
+                        <span class="movie-year">1945</span>
+                        <span class="movie-duration">10000 Horas</span>
+                        <span class="movie-rating">666+</span>
+                    </div>
+                    <div class="movie-production">
+                        <p><strong>Produção:</strong> Jalambi Pinto</p>
+                        <p><strong>Prêmio:</strong> Nobel de desgraçamento mental de 1945</p>
+                    </div>
+                    <div class="movie-synopsis">
+                        <h3>Sinopse</h3>
+                        <p><em>A historia de como Paulo Cuperdido se encontrou-se com uma criatura pobreta chamada pedro perto da casa do caralho junto eles foram fude até o talo euhgughughu kkkkkkkkkkkkkkkkkkkkkk</em></p>
+                        <p>Esteja ciente: o conteúdo a seguir pode estuprar compreensão humana e desafiar as leis da PUTARIA.</p>
+                    </div>
+                    <div class="movie-cast">
+                        <h3>Elenco</h3>
+                        <ul>
+                            <li>Pedro (o homeless)</li>
+                            <li>Paulo Cuperdido</li>
+                            <li>O espectador (O viado)</li>
+                        </ul>
+                    </div>
+                    <div class="movie-trailer">
+                        <h3>Trailer</h3>
+                        <div class="trailer-placeholder">
+                            <p>Trailer? A mera concepção de um trailer para esta obra é uma bosta.</p>
+                        </div>
+                    </div>
+                    <div class="movie-gallery">
+                        <h3>Galeria</h3>
+                        <div class="gallery-images">
+                            <div class="gallery-image-placeholder">
+                                <p>Imagens que te deixaram de pika dura.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="back-button">
+                        <a href="index.html#filmes" class="btn">Voltar (se tiver coragem)</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="related-movies">
+        <div class="container">
+            <h2>Obras que Tentaram Chegar Perto</h2>
+            <div class="related-movies-grid">
+                <div class="movie-card">
+                    <img src="images/YAGO_o_secreto.png" alt="YAGO o Secreto">
+                    <div class="movie-info">
+                        <h3>YAGO o Secreto</h3>
+                        <p>Um mistério pálido em comparação.</p>
+                        <a href="yago-o-secreto.html" class="btn">Ver Detalhes</a>
+                    </div>
+                </div>
+                <div class="movie-card">
+                    <img src="images/agasalhei-o-croquete.png" alt="Agasalhei o Croquete">
+                    <div class="movie-info">
+                        <h3>Agasalhei o Croquete</h3>
+                        <p>Comédia terrena.</p>
+                        <a href="agasalhei-o-croquete.html" class="btn">Ver Detalhes</a>
+                    </div>
+                </div>
+                 <div class="movie-card">
+                    <img src="images/peideinafarofaHD.png" alt="Peidei na Farofa">
+                    <div class="movie-info">
+                        <h3>Peidei na Farofa</h3>
+                        <p>Um clássico de outra dimensão de normalidade.</p>
+                        <a href="peidei-na-farofa.html" class="btn">Ver Detalhes</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>© 1945-Eternidade Jalambi pinto Movies & Entidades Associadas. Nenhum direito reservado, pois todos foram consumidos.</p>
+        </div>
+    </footer>
+
+    <button id="mute-button" class="mute-button">Mute BGM (Se Ousa)</button>
+
+    <audio id="bgm-sound" src="https://files.catbox.moe/6attsg.mp3" autoplay loop preload="auto"></audio>
+    <audio id="hover-sound" src="https://files.catbox.moe/7ggm5j.mp3" preload="auto"></audio>
+    <audio id="about-sound" src="https://files.catbox.moe/6f07t8.mp3" preload="auto"></audio>
+    <audio id="easter-egg-pedro-sound" src="https://files.catbox.moe/9eux23.mp3" preload="auto"></audio>
+
+    <script src="js/script.js"></script>
+    <script src="js/animations.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const pedroTrigger = document.getElementById('pedro-trigger-word');
+            const easterEggSound = document.getElementById('easter-egg-pedro-sound');
+            const mainBgmSound = document.getElementById('bgm-sound');
+            let pedroClickCount = 0;
+            const clicksNeeded = 10;
+            let easterEggActivated = false;
+
+            if (pedroTrigger && easterEggSound && mainBgmSound) {
+                pedroTrigger.addEventListener('click', () => {
+                    if (easterEggActivated) return;
+                    pedroClickCount++;
+                    easterEggSound.currentTime = 0;
+                    easterEggSound.play().catch(e => console.error("Falha ao tocar som do easter egg:", e));
+                    pedroTrigger.style.transition = 'transform 0.1s ease';
+                    pedroTrigger.style.transform = 'scale(1.1)';
+                    setTimeout(() => { pedroTrigger.style.transform = 'scale(1)'; }, 100);
+
+                    if (pedroClickCount >= clicksNeeded) {
+                        easterEggActivated = true;
+                        mainBgmSound.pause();
+                        document.body.classList.add('easter-egg-active');
+                        const numParticles = 100;
+                        for (let i = 0; i < numParticles; i++) {
+                            createMilkParticle();
+                        }
+                    }
+                });
+            }
+
+            function createMilkParticle() {
+                const particle = document.createElement('img');
+                particle.src = 'images/Pedro_Natural_Leite.png';
+                particle.classList.add('milk-particle-image');
+                particle.alt = "Partícula de Leite Pedro Natural";
+                document.body.appendChild(particle);
+
+                const startX = Math.random() * window.innerWidth;
+                const startY = Math.random() * -300 - 50;
+                const endY = window.innerHeight + 100;
+                const explosionForceX = (Math.random() - 0.5) * (window.innerWidth / 1.5);
+                const endX = startX + explosionForceX;
+                const duration = Math.random() * 4000 + 2500;
+                const initialRotation = Math.random() * 360;
+                const endRotation = initialRotation + (Math.random() - 0.5) * 1080;
+
+                // --- AJUSTE PARA TAMANHOS MAIS ALEATÓRIOS ---
+                // A escala será um valor entre 0.5 (50%) e 1.8 (180%) do tamanho base definido no CSS.
+                // Isso dará uma variação maior.
+                const randomInitialScale = Math.random() * 1.3 + 0.5; // Intervalo de 0.5 a 1.8
+                // A escala final pode diminuir um pouco em relação à inicial, ou aumentar, para mais variedade.
+                const randomFinalScale = randomInitialScale * (Math.random() * 0.5 + 0.5); // Entre 50% e 100% da escala inicial
+
+                particle.style.left = startX + 'px';
+                particle.style.top = startY + 'px';
+                particle.style.transform = `translateY(0px) rotate(${initialRotation}deg) scale(${randomInitialScale})`;
+
+                particle.animate([
+                    { opacity: 0 }, // Começa invisível e na posição definida por .style
+                    { opacity: 1, offset: 0.05 },
+                    { opacity: 0.8, transform: `translate(${(endX - startX)}px, ${endY - startY}px) rotate(${endRotation}deg) scale(${randomFinalScale})`}
+                ], {
+                    duration: duration,
+                    easing: 'cubic-bezier(0.3, 0.1, 0.4, 1)',
+                    fill: 'forwards'
+                }).onfinish = () => {
+                    particle.remove();
+                };
+            }
+        });
+    </script>
+</body>
+</html>

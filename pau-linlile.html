@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Pau Linlile O filme - Jalambi Pinto Movies</title>
+    <!-- Favicon -->
+    <link href="images/favicon.ico" rel="shortcut icon"/>
+    <link href="images/favicon.ico" rel="icon" sizes="64x64"/>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- CSS -->
+    <link href="css/style.css" rel="stylesheet"/>
+    <link href="css/movie-detail.css" rel="stylesheet"/>
+    <link href="css/animations.css" rel="stylesheet"/>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo-container">
+                <img src="images/JLMB logo.png" alt="Jalambi pinto Logo">
+                <h1>Jalambi Pinto Movies</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html" class="nav-item">Home</a></li>
+                    <li><a href="index.html#filmes" class="nav-item">Filmes</a></li>
+                    <li><a href="index.html#proximos" class="nav-item">Próximos</a></li>
+                    <li><a href="index.html#sobre" class="nav-item">Sobre</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="movie-detail">
+        <div class="container">
+            <div class="movie-detail-content">
+                <div class="movie-poster">
+                    <img alt="Pau Linlile" src="images/AindaEmProdução.png"/>
+                </div>
+                <div class="movie-info-detail">
+                    <h2>Pau Linlile O Filme</h2>
+                    <div class="movie-meta">
+                        <span class="movie-year">2025</span>
+                        <span class="movie-rating">A confirmar</span>
+                        <span class="movie-duration">?? min</span>
+                    </div>
+                    <div class="movie-production">
+                        <p><strong>Produção:</strong> Jalambi pinto</p>
+                    </div>
+                    <div class="movie-synopsis">
+                        <h3>Sinopse</h3>
+                        <p>Ainda em Produção. Os detalhes mais quentes sobre esta aventura cinematográfica solo de Pau Linlile estão sendo guardados a sete chaves (ou talvez em um lugar mais apertado). Prepare-se para o inesperado!</p>
+                    </div>
+                    <div class="movie-cast">
+                        <h3>Elenco</h3>
+                        <ul>
+                            <li>Pau Linlile (Protagonista Supremo)</li>
+                            <li>Participações Especiais Surpresa</li>
+                        </ul>
+                    </div>
+                    <div class="movie-trailer">
+                        <h3>Prévia de Teste <small>(NÃO SERÁ O PRODUTO FINAL)</small></h3>
+                        <video controls width="100%">
+                            <source src="https://files.catbox.moe/uof6rl.mp4" type="video/mp4"/>
+                            Seu navegador não suporta a reprodução de vídeo.
+                        </video>
+                    </div>
+                    <div class="movie-gallery">
+                        <h3>Galeria</h3>
+                        <div class="gallery-images">
+                            <div class="gallery-image-placeholder">
+                                <p>Imagens em breve!</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="back-button">
+                        <a class="btn" href="index.html#proximos">Voltar para Próximos Lançamentos</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="related-movies">
+        <div class="container">
+            <h2>Outros Filmes da Produtora</h2>
+            <div class="related-movies-grid">
+                <div class="movie-card">
+                    <img src="images/agasalhei-o-croquete.png" alt="Agasalhei o Croquete">
+                    <div class="movie-info">
+                        <h3>Agasalhei o Croquete</h3>
+                        <p>Veja Pau Linlile em sua Edição Super Especial!</p>
+                        <a href="agasalhei-o-croquete.html" class="btn">Ver Detalhes</a>
+                    </div>
+                </div>
+                <div class="movie-card">
+                    <img src="images/cagueinoacogueHD.png" alt="Caguei no Açougue">
+                    <div class="movie-info">
+                        <h3>Caguei no Açougue</h3>
+                        <p>Participação especial de Paulinlile!</p>
+                        <a href="caguei-no-acougue.html" class="btn">Ver Detalhes</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>© 2025 Jalambi pinto Movies. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <button class="mute-button" id="mute-button">Mute BGM</button>
+
+    <audio autoplay id="bgm-sound" loop preload="auto" src="https://files.catbox.moe/s5v55s.mp3"></audio>
+    <audio id="hover-sound" preload="auto" src="https://files.catbox.moe/7ggm5j.mp3"></audio>
+    <audio id="about-sound" preload="auto" src="https://files.catbox.moe/6f07t8.mp3"></audio>
+
+    <script src="js/script.js"></script>
+    <script src="js/animations.js"></script>
+</body>
+</html>

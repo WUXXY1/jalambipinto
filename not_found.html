@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página Não Encontrada - Jalambi Pinto Movies</title>
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="images/favicon.ico">
+    <link rel="icon" sizes="64x64" href="images/favicon.ico">
+    <!-- Google Fonts (fallback/geral) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <style>
+        /* Estilos específicos para a página 404, se necessário */
+        .error-page-section {
+            padding: 60px 0;
+            background-color: var(--dark-bg);
+            text-align: center;
+            min-height: 70vh; /* Para ocupar mais espaço vertical */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .error-gif {
+            width: 512px;
+            height: 512px;
+            cursor: pointer;
+            margin-bottom: 30px;
+            border-radius: var(--border-radius); /* Opcional: se quiser bordas arredondadas no gif */
+            box-shadow: var(--box-shadow); /* Opcional: para dar um destaque */
+        }
+        .error-title {
+            font-family: 'LTSipRegular', var(--font-headings-default);
+            font-size: 2.8rem; /* Ajustado */
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+        .error-main-message {
+            font-family: 'CopperplateGothicBold', var(--font-headings-default);
+            font-size: 3.5rem; /* Ajustado */
+            color: #fff;
+            margin-bottom: 25px;
+            line-height: 1.2;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        .error-description {
+            color: var(--text-muted-color);
+            font-size: 1.1rem;
+            margin-bottom: 40px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        @media screen and (max-width: 560px) {
+            .error-gif {
+                width: 90%;
+                max-width: 400px; /* Limite para não ficar muito grande */
+                height: auto;
+            }
+            .error-title {
+                font-size: 2rem;
+            }
+            .error-main-message {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo-container">
+                <img src="images/JLMB logo.png" alt="Jalambi pinto Logo">
+                <h1 class="site-title">Jalambi Pinto Movies</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html" class="nav-item">Home</a></li>
+                    <li><a href="index.html#filmes" class="nav-item">Filmes</a></li>
+                    <li><a href="index.html#proximos" class="nav-item">Próximos</a></li>
+                    <li><a href="index.html#sobre" class="nav-item">Sobre</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="error-page-section">
+        <div class="container">
+            <img id="error-gif-interactive" src="images/stage1.gif" alt="Erro 404 - Página não encontrada" class="error-gif">
+            
+            <h2 class="error-title">Oops! Algo deu errado...</h2>
+            
+            <p class="error-main-message">A PÁGINA BROXOU!?</p>
+            
+            <p class="error-description">
+                Parece que o link que você tentou acessar não existe, foi removido, ou talvez esteja apenas tirando uma soneca. <br>
+                Mas não se preocupe, você pode voltar para a página inicial e encontrar outras pérolas cinematográficas!
+            </p>
+            
+            <a href="index.html" class="btn">Voltar para Home</a>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>© 2025 Jalambi pinto Movies. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- Botão de Mute (inicialmente escondido pelo CSS) -->
+    <button id="mute-button" class="mute-button">Mute BGM</button>
+
+    <!-- Sons (usando os mesmos da maioria das páginas para consistência) -->
+    <audio id="bgm-sound" src="https://files.catbox.moe/8t639c.mp3" autoplay preload="auto"></audio>
+    <audio id="hover-sound" src="https://files.catbox.moe/7ggm5j.mp3" preload="auto"></audio>
+    <audio id="about-sound" src="https://files.catbox.moe/6f07t8.mp3" preload="auto"></audio>
+
+    <script src="js/script.js"></script>
+    <script src="js/animations.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const errorGif = document.getElementById('error-gif-interactive');
+            if (!errorGif) {
+                console.error("Elemento #error-gif-interactive não encontrado!");
+                return;
+            }
+
+            let gifClickCount = 0;
+            let currentStage = 1;
+            const maxStage = 4;
+            const clicksToAdvance = 5; // 5 cliques para mudar de estágio
+
+            // Força o primeiro GIF a tocar, adicionando um timestamp.
+            // Isso é útil para GIFs não-looping que podem ser cacheados.
+            errorGif.src = `images/stage${currentStage}.gif?t=${Date.now()}`;
+
+            errorGif.addEventListener('click', function() {
+                gifClickCount++;
+
+                if (gifClickCount >= clicksToAdvance) {
+                    if (currentStage < maxStage) {
+                        currentStage++;
+                        errorGif.src = `images/stage${currentStage}.gif?t=${Date.now()}`;
+                    } else { // currentStage é maxStage (4)
+                        // Replay do último estágio (stage4.gif)
+                        errorGif.src = `images/stage${maxStage}.gif?t=${Date.now()}`;
+                    }
+                    gifClickCount = 0; // Reseta a contagem de cliques para o estágio atual (ou novo)
+                }
+                // Se gifClickCount < clicksToAdvance, o GIF (não-looping) já tocou e parou.
+                // Nada acontece visualmente até o 5º clique.
+            });
+        });
+    </script>
+</body>
+</html>

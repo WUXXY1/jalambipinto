@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Nego Man - Jalambi Pinto Entertainment</title>
+    <link rel="shortcut icon" href="images/favicon.ico">
+    <link rel="icon" sizes="64x64" href="images/favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { margin: 0; padding: 0; background-color: #2c3e50; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; font-family: 'Poppins', sans-serif; color: white; }
+        .game-wrapper { text-align: center; position: relative; } /* Posição relativa para o HUD */
+        #gameCanvas { border: 3px solid #ecf0f1; background-color: #3498db; image-rendering: pixelated; display: block; }
+        .hud { font-family: 'Press Start 2P', cursive; margin-top: 15px; font-size: 1.2em; color: #f1c40f; }
+        .hud span { color: #ffffff; }
+        .controls-info { margin-top: 20px; font-size: 0.9em; color: #bdc3c7; }
+        .controls-info p { margin: 5px 0; }
+        .game-buttons button, .back-to-site-btn { font-family: 'Press Start 2P', cursive; background-color: #e74c3c; color: white; border: none; padding: 10px 20px; font-size: 0.9em; cursor: pointer; border-radius: 5px; text-shadow: 1px 1px #000; transition: background-color 0.2s; margin: 10px 5px 0 5px; }
+        .game-buttons button:hover, .back-to-site-btn:hover { background-color: #c0392b; }
+        .back-to-site-btn { background-color: #7f8c8d; margin-top: 20px; margin-bottom: 20px; }
+        .back-to-site-btn:hover { background-color: #525c60; }
+        h1 { font-family: 'Press Start 2P', cursive; color: #ff6b00; margin-bottom: 10px; font-size: 2em; }
+
+        /* --- ESTILOS DE TELA CHEIA --- */
+        body.fullscreen-mode { background: #000; }
+        body.fullscreen-mode .game-wrapper { width: 100%; height: 100vh; }
+        body.fullscreen-mode h1,
+        body.fullscreen-mode .back-to-site-btn { display: none; }
+        
+        /* Estilo para HUD e botões em tela cheia */
+        body.fullscreen-mode .hud,
+        body.fullscreen-mode .controls-info,
+        body.fullscreen-mode .game-buttons {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border-radius: 8px;
+        }
+        body.fullscreen-mode .hud { top: 10px; font-size: 1.5vw; }
+        body.fullscreen-mode .controls-info { bottom: 70px; font-size: 1vw; }
+        body.fullscreen-mode .game-buttons { bottom: 10px; }
+        
+        /* Modo "Adaptado" (Stretch) */
+        body.fullscreen-stretch #gameCanvas {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* Modo "Proporcional" (Keep Aspect) */
+        body.fullscreen-aspect .game-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        body.fullscreen-aspect #gameCanvas {
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* A mágica acontece aqui */
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-wrapper">
+        <h1>SUPER NEGO MAN</h1>
+        <canvas id="gameCanvas" width="800" height="600"></canvas>
+        <div class="hud">
+            Moedas: <span id="score">0</span> | Vidas: <span id="lives">3</span> | Munição: <span id="ammo-display">0</span>
+            <span id="boss-hud" style="display:none; margin-left: 10px;">| ZOIO HP: <span id="boss-hp">100</span></span>
+        </div>
+        <div class="controls-info">
+            <p>Use A/D ou Setas para Mover</p>
+            <p>Espaço para Pular | E para Atacar</p>
+        </div>
+        <div class="game-buttons">
+            <button id="startButton">Iniciar</button>
+            <button id="resetButton" style="display: none;">Resetar</button>
+            <button id="fullscreen-stretch-btn">Fullscreen (Adaptado)</button>
+            <button id="fullscreen-aspect-btn">Fullscreen (Proporcional)</button>
+            <button id="fullscreen-exit-btn" style="display: none;">Sair da Tela Cheia</button>
+        </div>
+        <a href="index.html" class="back-to-site-btn">Voltar ao Site Principal</a>
+    </div>
+
+    <script>
+        // --- CONSTANTES ---
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const scoreDisplay = document.getElementById('score');
+        const livesDisplay = document.getElementById('lives');
+        const ammoDisplay = document.getElementById('ammo-display');
+        const startButton = document.getElementById('startButton');
+        const resetButton = document.getElementById('resetButton');
+        const bossHud = document.getElementById('boss-hud');
+        const bossHpDisplay = document.getElementById('boss-hp');
+
+        const GRAVITY = 0.7;
+        const PLAYER_MOVE_SPEED = 6;
+        const PLAYER_JUMP_FORCE = 16;
+        const TILE_SIZE = 50;
+        const BOSS_ARENA_START_X = 6000;
+        const PLAYER_ORIGINAL_WIDTH = TILE_SIZE * 1.5;
+        const PLAYER_ORIGINAL_HEIGHT = TILE_SIZE * 2.2;
+
+        // --- VARIÁVEIS DE ESTADO DO JOGO ---
+        let score = 0;
+        let lives = 3;
+        let isGameRunning = false;
+        let gameTime = 0;
+        let cameraX = 0;
+        let gameWon = false;
+
+        let stats = {};
+        const player = { x: 100, y: canvas.height - TILE_SIZE - 150, width: PLAYER_ORIGINAL_WIDTH, height: PLAYER_ORIGINAL_HEIGHT, dx: 0, dy: 0, onGround: false, state: 'idle', direction: 'right', animationFrame: 0, animationTimer: 0, animationBaseSpeed: 5, get currentAnimationSpeed() { if (this.state === 'walking') return this.animationBaseSpeed / 1.5; if (this.state === 'jumping' || this.state === 'falling') return this.animationBaseSpeed * 1.2; return this.animationBaseSpeed; }, spriteSheets: {}, spriteData: {}, currentFrameData: null, isPoweredUp: false, powerUpTimer: 0, bleachAmmo: 0 };
+        
+        // --- ASSETS ---
+        const images = { walking: new Image(), jump: new Image(), idle: new Image(), death: new Image(), grass: new Image(), starblock: new Image(), starblock_hit: new Image(), goomba: new Image(), farofa: new Image(), bleach: new Image(), trampoline: new Image(), placa: new Image(), zoio: new Image(), marreta: new Image(), poderCard: new Image() };
+        const sounds = {
+            bgmMusic: new Audio('https://files.catbox.moe/bvwodo.mp3'),
+            bossMusic: new Audio('https://files.catbox.moe/5x5azl.mp3'),
+            victoryMusic: new Audio('https://files.catbox.moe/aog0ru.mp3'),
+            dialogue1: new Audio('https://files.catbox.moe/od4q8i.mp3'),
+            dialogue2: new Audio('https://files.catbox.moe/um035j.mp3'),
+            bossTaunt1: new Audio('https://files.catbox.moe/1yhdsn.mp3'),
+            bossTaunt2: new Audio('https://files.catbox.moe/g27l1g.mp3'),
+            bossTaunt3: new Audio('https://files.catbox.moe/pnwzr4.mp3'),
+            playerHit: new Audio('https://files.catbox.moe/td74en.mp3'),
+            playerDeathGeneric: new Audio('https://files.catbox.moe/w3mtpu.mp3'),
+            playerDeathBoss: new Audio('https://files.catbox.moe/pnwzr4.mp3'),
+            playerPowerup: new Audio('https://files.catbox.moe/ljuguk.mp3'),
+            bleachAttack: new Audio('https://www.myinstants.com/media/sounds/swoosh-sound-effect.mp3'),
+            playerJump: new Audio('https://files.catbox.moe/qps6ai.mp3'),
+            trampolineJump: new Audio('https://files.catbox.moe/e67fwz.mp3'),
+            bossDefeat: new Audio('https://files.catbox.moe/8jlx29.mp3'),
+            poderCollect: new Audio('https://files.catbox.moe/cs9v31.mp3')
+        };
+        sounds.bgmMusic.loop = true;
+        sounds.bossMusic.loop = true;
+        const bossTaunts = [sounds.bossTaunt1, sounds.bossTaunt2, sounds.bossTaunt3];
+
+        let assetsLoaded = 0;
+        const totalAssets = Object.keys(images).length;
+        function assetLoaded() { assetsLoaded++; if (assetsLoaded === totalAssets) { loadSpriteData(); } }
+
+        images.walking.onload = assetLoaded; images.walking.src = 'images/negoman_spritesheet_walking.png';
+        images.jump.onload = assetLoaded; images.jump.src = 'images/negoman_spritesheet_jump.png';
+        images.idle.onload = assetLoaded; images.idle.src = 'images/negoman_idle.png';
+        images.death.onload = assetLoaded; images.death.src = 'images/negoman_death.png';
+        images.grass.onload = assetLoaded; images.grass.src = 'images/grass.png';
+        images.starblock.onload = assetLoaded; images.starblock.src = 'images/starblock.png';
+        images.starblock_hit.onload = assetLoaded; images.starblock_hit.src = 'images/starblock_hit.png';
+        images.goomba.onload = assetLoaded; images.goomba.src = 'images/pija_ruim.png';
+        images.farofa.onload = assetLoaded; images.farofa.src = 'images/farofa.png';
+        images.bleach.onload = assetLoaded; images.bleach.src = 'images/agua_sanitaria.png';
+        images.trampoline.onload = assetLoaded; images.trampoline.src = 'images/trampoline.png';
+        images.placa.onload = assetLoaded; images.placa.src = 'images/placa.png';
+        images.zoio.onload = assetLoaded; images.zoio.src = 'images/zoio.png';
+        images.marreta.onload = assetLoaded; images.marreta.src = 'images/marreta.png';
+        images.poderCard.onload = assetLoaded; images.poderCard.src = 'images/poder_card.png';
+
+        async function loadSpriteData() {
+            try {
+                const [walkingResponse, jumpResponse] = await Promise.all([fetch('js/walking.json'), fetch('js/jump.json')]);
+                player.spriteData.walking = await walkingResponse.json();
+                player.spriteData.jump = await jumpResponse.json();
+                console.log("Assets carregados.");
+                startButton.disabled = false; startButton.textContent = "Iniciar";
+            } catch (error) { console.error("Erro ao carregar spritesheets:", error); startButton.textContent = "Erro Assets"; }
+        }
+        startButton.disabled = true; startButton.textContent = "Carregando...";
+
+        let platforms = [], enemies = [], powerUpBlocks = [], powerUps = [], trampolines = [], specialObjects = [], hammers = [], lasers = [], rotatingLasers = [], sansLasers = [], specialPowerUps = [], bleachProjectiles = [];
+        let boss = {};
+        let bossFightState = { active: false, dialogue: false, step: 0, dialogueSeen: false };
+
+        function resetBoss() {
+            boss = { x: BOSS_ARENA_START_X + 1200, y: canvas.height - TILE_SIZE - 250, width: 250, height: 250, originalHeight: 250, hp: 100, maxHp: 100, state: 'idle', isSpawned: false, attackTimer: 0, vulnerableTimer: 0, tauntTimer: 0, vibration: 0, rotatingLaserAngle: 0, powerUpSpawnTimer: 600 };
+            hammers = []; lasers = []; rotatingLasers = []; sansLasers = []; specialPowerUps = []; bleachProjectiles = [];
+            enemies = enemies.filter(e => e.x < BOSS_ARENA_START_X);
+            specialObjects = specialObjects.filter(o => o.type !== 'placa');
+        }
+
+        function resetStats() {
+            stats = { enemiesStomped: 0, powerupsCollected: 0, jumps: 0, trampolineJumps: 0, distanceWalked: 0 };
+            gameTime = 0;
+        }
+
+        function generateInitialMap() {
+            platforms = []; enemies = []; powerUpBlocks = []; powerUps = []; trampolines = []; specialObjects = [];
+            player.x = 100; player.y = canvas.height - TILE_SIZE - player.height;
+            player.dx = 0; player.dy = 0; player.onGround = false; player.state = 'idle';
+            player.isPoweredUp = false; player.powerUpTimer = 0; player.bleachAmmo = 0;
+            cameraX = 0;
+            
+            for (let i = 0; i < 30; i++) { platforms.push({ x: i * TILE_SIZE, y: canvas.height - TILE_SIZE, width: TILE_SIZE, height: TILE_SIZE, type: 'grass' }); }
+            platforms.push({ x: 5 * TILE_SIZE, y: canvas.height - 4 * TILE_SIZE, width: 4 * TILE_SIZE, height: TILE_SIZE, type: 'grass' });
+            powerUpBlocks.push({x: 7 * TILE_SIZE, y: canvas.height - 6 * TILE_SIZE, width: TILE_SIZE, height: TILE_SIZE, type: 'starblock', hit: false, visualHit: false, releasedItem: false});
+            powerUps.push({ x: 8 * TILE_SIZE, y: canvas.height - 7.5 * TILE_SIZE, width: TILE_SIZE / 1.8, height: TILE_SIZE / 1.8, type: 'bleach' });
+            enemies.push({ x: 12 * TILE_SIZE, y: canvas.height - TILE_SIZE - (TILE_SIZE * 0.9), width: TILE_SIZE * 0.9, height: TILE_SIZE * 0.9, type: 'goomba', dx: -1, originalX: 12 * TILE_SIZE, patrolRange: TILE_SIZE * 4 });
+            trampolines.push({x: 15 * TILE_SIZE, y: canvas.height - TILE_SIZE * 2, width: TILE_SIZE, height: TILE_SIZE, type: 'trampoline'});
+            
+            gameWon = false;
+            bossFightState.dialogueSeen = false;
+            resetBoss();
+            resetStats();
+        }
+        
+        function updateHUD() {
+            scoreDisplay.textContent = score;
+            livesDisplay.textContent = lives;
+            ammoDisplay.textContent = player.bleachAmmo;
+            bossHpDisplay.textContent = Math.max(0, boss.hp);
+        }
+
+        // --- CÓDIGO DO JOGO (GERAÇÃO DE MAPA, INPUT, UPDATE, DRAW, ETC.) ---
+        // (Todo o código do jogo que já estava aqui permanece o mesmo)
+        function generateMapIfNeeded() {
+            if (boss.isSpawned) return;
+            if (player.x > BOSS_ARENA_START_X - canvas.width / 2 && !specialObjects.find(o => o.type === 'placa')) {
+                specialObjects.push({ x: BOSS_ARENA_START_X - canvas.width/4, y: canvas.height - TILE_SIZE * 4, width: TILE_SIZE * 4, height: TILE_SIZE * 3, type: 'placa' });
+                sounds.bgmMusic.pause(); sounds.bgmMusic.currentTime = 0;
+            }
+            if (player.x > BOSS_ARENA_START_X && !boss.isSpawned) {
+                boss.isSpawned = true;
+                
+                specialObjects = [];
+                enemies = enemies.filter(e => e.x < BOSS_ARENA_START_X);
+                powerUpBlocks = powerUpBlocks.filter(b => b.x < BOSS_ARENA_START_X);
+                powerUps = powerUps.filter(pu => pu.x < BOSS_ARENA_START_X);
+                trampolines = trampolines.filter(t => t.x < BOSS_ARENA_START_X);
+
+                const arenaFloorLength = 40;
+                const arenaEndX = BOSS_ARENA_START_X + arenaFloorLength * TILE_SIZE;
+
+                for (let i = 0; i < arenaFloorLength; i++) { 
+                    platforms.push({ x: BOSS_ARENA_START_X + i * TILE_SIZE, y: canvas.height - TILE_SIZE, width: TILE_SIZE, height: TILE_SIZE, type: 'grass' }); 
+                }
+                
+                platforms.push({ x: BOSS_ARENA_START_X - TILE_SIZE, y: 0, width: TILE_SIZE, height: canvas.height, type: 'grass' }); 
+                platforms.push({ x: arenaEndX, y: 0, width: TILE_SIZE, height: canvas.height, type: 'grass' });
+
+                trampolines.push({ x: BOSS_ARENA_START_X + 5 * TILE_SIZE, y: canvas.height - TILE_SIZE * 2, width: TILE_SIZE, height: TILE_SIZE, type: 'trampoline' });
+                trampolines.push({ x: arenaEndX - 6 * TILE_SIZE, y: canvas.height - TILE_SIZE * 2, width: TILE_SIZE, height: TILE_SIZE, type: 'trampoline' });
+
+                return;
+            }
+            const lastPlatform = platforms[platforms.length - 1];
+            if (lastPlatform && player.x > lastPlatform.x - canvas.width * 1.5) {
+                const startX = lastPlatform.x + lastPlatform.width;
+                const numNewPlatforms = 10 + Math.floor(Math.random() * 5);
+                for (let i = 0; i < numNewPlatforms; i++) { platforms.push({ x: startX + i * TILE_SIZE, y: canvas.height - TILE_SIZE, width: TILE_SIZE, height: TILE_SIZE, type: 'grass' }); }
+                if (Math.random() < 0.1) { trampolines.push({ x: startX + (Math.floor(Math.random() * numNewPlatforms)) * TILE_SIZE, y: canvas.height - TILE_SIZE * 2, width: TILE_SIZE, height: TILE_SIZE, type: 'trampoline' }); }
+                if (Math.random() < 0.3) { const platY = canvas.height - (Math.floor(Math.random() * 3) + 3) * TILE_SIZE; const platWidth = (Math.floor(Math.random() * 3) + 2) * TILE_SIZE; platforms.push({ x: startX + (Math.floor(Math.random() * numNewPlatforms)) * TILE_SIZE, y: platY, width: platWidth, height: TILE_SIZE, type: 'grass' });}
+                if (Math.random() < 0.2) { powerUpBlocks.push({ x: startX + (Math.floor(Math.random() * numNewPlatforms)) * TILE_SIZE, y: canvas.height - (Math.floor(Math.random() * 2) + 5) * TILE_SIZE, width: TILE_SIZE, height: TILE_SIZE, type: 'starblock', hit: false, visualHit:false, releasedItem: false});}
+                if (Math.random() < 0.3) { powerUps.push({ x: startX + (Math.floor(Math.random() * numNewPlatforms) + 2) * TILE_SIZE, y: canvas.height - (Math.floor(Math.random() * 2) + 4) * TILE_SIZE, width: TILE_SIZE/1.8, height: TILE_SIZE/1.8, type: 'bleach' });}
+                if (Math.random() < 0.15) { enemies.push({ x: startX + (Math.floor(Math.random() * numNewPlatforms) +3) * TILE_SIZE, y: canvas.height - TILE_SIZE  - (TILE_SIZE*0.9), width: TILE_SIZE*0.9, height: TILE_SIZE*0.9, type: 'goomba', dx: (Math.random() < 0.5 ? -1 : 1), originalX: startX + (Math.floor(Math.random() * numNewPlatforms)+3) * TILE_SIZE, patrolRange: TILE_SIZE * 4 });}
+            }
+        }
+        const keys = {};
+        document.addEventListener('keydown', (e) => {
+            const key = e.key.toLowerCase();
+            keys[key] = true;
+            if (key === ' ' || key === 'e') e.preventDefault();
+            if (key === 'e' && player.bleachAmmo > 0 && !bossFightState.dialogue && isGameRunning) {
+                player.bleachAmmo--;
+                sounds.bleachAttack.currentTime = 0;
+                sounds.bleachAttack.play();
+                const projectileSpeed = 10;
+                bleachProjectiles.push({
+                    x: player.x + player.width / 2,
+                    y: player.y + player.height / 2,
+                    width: 20, height: 10,
+                    dx: player.direction === 'right' ? projectileSpeed : -projectileSpeed,
+                    life: 60
+                });
+            }
+        });
+        document.addEventListener('keyup', (e) => { keys[e.key.toLowerCase()] = false; });
+        function handleInput() {
+            if (player.state === 'dead' || bossFightState.dialogue || gameWon) { player.dx = 0; return; }
+            player.dx = 0;
+            if (keys['a'] || keys['arrowleft']) { player.dx = -PLAYER_MOVE_SPEED; player.direction = 'left'; if (player.onGround) player.state = 'walking'; }
+            if (keys['d'] || keys['arrowright']) { player.dx = PLAYER_MOVE_SPEED; player.direction = 'right'; if (player.onGround) player.state = 'walking'; }
+            if ((keys[' '] || keys['w'] || keys['arrowup']) && player.onGround) {
+                player.dy = -PLAYER_JUMP_FORCE; player.onGround = false; player.state = 'jumping';
+                player.animationFrame = 0; sounds.playerJump.currentTime = 0; sounds.playerJump.play();
+                stats.jumps++;
+            }
+            if(player.dx === 0 && player.onGround && player.state !== 'idle' && player.state !== 'jumping' && player.state !== 'falling'){ player.state = 'idle'; }
+            if (Math.abs(player.dx) > 0 && player.onGround) { stats.distanceWalked += Math.abs(player.dx); }
+        }
+        function updatePlayer() {
+            if (player.state === 'dead') {
+                player.dy += GRAVITY * 1.5; player.y += player.dy;
+                if (player.y > canvas.height + player.height * 2) { handleDeath(); }
+                return;
+            }
+            if (player.isPoweredUp) {
+                player.powerUpTimer--;
+                player.width = PLAYER_ORIGINAL_WIDTH * 1.5;
+                player.height = PLAYER_ORIGINAL_HEIGHT * 1.5;
+                if (player.powerUpTimer <= 0) {
+                    player.isPoweredUp = false;
+                    player.width = PLAYER_ORIGINAL_WIDTH;
+                    player.height = PLAYER_ORIGINAL_HEIGHT;
+                }
+            }
+            if (boss.isSpawned && boss.state === 'idle' && !bossFightState.dialogue && !bossFightState.dialogueSeen &&
+                player.x < boss.x + boss.width && player.x + player.width > boss.x &&
+                player.y < boss.y + boss.height && player.y + player.height > boss.y) {
+                bossFightState.dialogue = true; player.dx = 0; runDialogue();
+            }
+            player.x += player.dx; player.dy += GRAVITY; player.y += player.dy; player.onGround = false;
+            [...platforms, ...powerUpBlocks].forEach(p => {
+                if (player.y + player.height >= p.y && player.y + player.height - player.dy <= p.y + 1 && player.x + player.width > p.x && player.x < p.x + p.width) {
+                    player.y = p.y - player.height; player.dy = 0; player.onGround = true;
+                    if (player.state === 'falling' || player.state === 'jumping') player.state = player.dx !== 0 ? 'walking' : 'idle';
+                }
+                if (player.y + player.height > p.y + 5 && player.y < p.y + p.height - 5) {
+                    if (player.dx > 0 && player.x + player.width >= p.x && player.x + player.width - player.dx < p.x) {
+                        player.x = p.x - player.width; player.dx = 0;
+                    }
+                    else if (player.dx < 0 && player.x <= p.x + p.width && player.x - player.dx > p.x + p.width) {
+                        player.x = p.x + p.width; player.dx = 0;
+                    }
+                }
+                if (p.type === 'starblock' && !p.hit && player.x < p.x + p.width && player.x + player.width > p.x && player.y <= p.y + p.height && player.y - player.dy > p.y + p.height && player.dy < 0) {
+                    player.y = p.y + p.height; player.dy = 0.1; p.hit = true; p.visualHit = true;
+                    if (!p.releasedItem) {
+                        powerUps.push({ x: p.x + (TILE_SIZE - TILE_SIZE * 0.7) / 2, y: p.y - TILE_SIZE * 0.7, width: TILE_SIZE * 0.7, height: TILE_SIZE * 0.7, type: 'farofa', dy: -4, onGround: false, gravityEffect: true });
+                        p.releasedItem = true;
+                    }
+                }
+            });
+            trampolines.forEach(t => {
+                if (player.dy > 0 && player.x < t.x + t.width && player.x + player.width > t.x && player.y + player.height >= t.y && player.y + player.height - player.dy <= t.y + 10) {
+                    player.dy = -PLAYER_JUMP_FORCE * 1.8; player.onGround = false;
+                    sounds.trampolineJump.currentTime = 0; sounds.trampolineJump.play();
+                    stats.trampolineJumps++;
+                }
+            });
+            if (player.y > canvas.height + player.height && !boss.isSpawned) {
+                if (lives > 0 && player.state !== 'dead') {
+                    if (!bossFightState.active && !bossFightState.dialogue) { sounds.playerDeathGeneric.currentTime = 0; sounds.playerDeathGeneric.play(); }
+                    player.state = 'dead'; player.dy = -PLAYER_JUMP_FORCE / 2; player.dx = 0;
+                }
+            }
+            if (!player.onGround && player.dy > GRAVITY && player.state !== 'dead') player.state = 'falling';
+            player.animationTimer++;
+            if (player.animationTimer >= player.currentAnimationSpeed) {
+                player.animationTimer = 0; player.animationFrame++;
+                const animType = (player.state === 'jumping' || player.state === 'falling') ? 'jump' : 'walking';
+                const currentAnimData = player.spriteData[animType];
+                if (player.state === 'idle' || player.state === 'dead') player.animationFrame = 0;
+                else if (currentAnimData && player.animationFrame >= currentAnimData.sprites.length) {
+                    if (player.state === 'jumping' || player.state === 'falling') player.animationFrame = currentAnimData.sprites.length -1;
+                    else player.animationFrame = 0;
+                }
+            }
+            const targetCameraX = player.x - canvas.width / 3;
+            if (boss.isSpawned) {
+                const arenaCamX = player.x > BOSS_ARENA_START_X + canvas.width / 2 ? player.x - canvas.width / 2 : BOSS_ARENA_START_X;
+                cameraX += (arenaCamX - cameraX) * 0.1;
+            } else { cameraX += (targetCameraX - cameraX) * 0.05; }
+            if (cameraX < 0) cameraX = 0;
+        }
+        function updateEnemies() {
+             enemies.forEach((enemy, enemyIndex) => {
+                if (enemy.type === 'goomba') {
+                    if (enemy.spawnedByBoss) {
+                        if (enemy.state === 'tracking') {
+                            const angle = Math.atan2(player.y - enemy.y, player.x - enemy.x);
+                            enemy.dx = Math.cos(angle) * 1.5; enemy.dy = Math.sin(angle) * 1.5;
+                            enemy.trackingTimer--;
+                             if (enemy.trackingTimer <= 0) {
+                                enemy.state = 'flying';
+                                const speed = 5; enemy.dx = Math.cos(angle) * speed; enemy.dy = Math.sin(angle) * speed;
+                            }
+                        }
+                        enemy.x += enemy.dx; enemy.y += enemy.dy;
+                    } else {
+                        enemy.x += enemy.dx;
+                        if (enemy.x < enemy.originalX - enemy.patrolRange || enemy.x + enemy.width > enemy.originalX + enemy.patrolRange) enemy.dx *= -1;
+                    }
+                }
+                if (player.state !== 'dead' && !player.isPoweredUp && player.x < enemy.x + enemy.width && player.x + player.width > enemy.x && player.y < enemy.y + enemy.height && player.y + player.height > enemy.y) {
+                    if (player.dy > 0 && (player.y + player.height) < (enemy.y + enemy.height * 0.5)) {
+                        enemies.splice(enemyIndex, 1); player.dy = -PLAYER_JUMP_FORCE / 1.8; score += 100;
+                        stats.enemiesStomped++;
+                    } else if (player.state !== 'dead') {
+                        if (bossFightState.active || bossFightState.dialogue) playerHitByBoss();
+                        else {
+                             sounds.playerDeathGeneric.currentTime = 0; sounds.playerDeathGeneric.play();
+                             player.state = 'dead'; player.dy = -PLAYER_JUMP_FORCE / 2; player.dx = (player.x < enemy.x ? -PLAYER_MOVE_SPEED : PLAYER_MOVE_SPEED) / 2;
+                        }
+                    }
+                }
+            });
+        }
+        function updateItems() {
+            powerUps.forEach((pu, index) => {
+                if (pu.gravityEffect && !pu.onGround) { pu.dy += GRAVITY / 1.5; pu.y += pu.dy; }
+                platforms.forEach(platform => { if (pu.x < platform.x + platform.width && pu.x + pu.width > platform.x && pu.y + pu.height >= platform.y && pu.y + pu.height - pu.dy <= platform.y + 1) { pu.y = platform.y - pu.height; pu.dy = 0; pu.onGround = true; } });
+                
+                if (player.x < pu.x + pu.width && player.x + player.width > pu.x && player.y < pu.y + pu.height && player.y + player.height > pu.y) {
+                    sounds.playerPowerup.currentTime = 0; sounds.playerPowerup.play();
+                    if (pu.type === 'farofa') {
+                        if (lives < 3) { lives++; stats.powerupsCollected++; }
+                    } else if (pu.type === 'bleach') {
+                        player.bleachAmmo += 5;
+                    }
+                    powerUps.splice(index, 1);
+                }
+            });
+            specialPowerUps.forEach((spu, index) => {
+                if (player.x < spu.x + spu.width && player.x + player.width > spu.x && player.y < spu.y + spu.height && player.y + player.height > spu.y) {
+                    specialPowerUps.splice(index, 1);
+                    player.isPoweredUp = true;
+                    player.powerUpTimer = 600;
+                    sounds.poderCollect.currentTime = 0; sounds.poderCollect.play();
+                }
+            });
+            bleachProjectiles.forEach((proj, index) => {
+                proj.x += proj.dx;
+                proj.life--;
+                if (proj.life <= 0) { bleachProjectiles.splice(index, 1); return; }
+                enemies.forEach((enemy, enemyIndex) => {
+                    if (proj.x < enemy.x + enemy.width && proj.x + proj.width > enemy.x && proj.y < enemy.y + enemy.height && proj.y + proj.height > enemy.y) {
+                        enemies.splice(enemyIndex, 1);
+                        bleachProjectiles.splice(index, 1);
+                        score += 50;
+                    }
+                });
+                if (bossFightState.active && proj.x < boss.x + boss.width && proj.x + proj.width > boss.x && proj.y < boss.y + boss.height && proj.y + proj.height > boss.y) {
+                    boss.hp -= 10;
+                    bleachProjectiles.splice(index, 1);
+                }
+            });
+        }
+        function runDialogue() {
+            player.dx = 0;
+            if (bossFightState.step === 0) { bossFightState.step = 1; setTimeout(runDialogue, 1500); }
+            else if (bossFightState.step === 1) { sounds.dialogue1.currentTime = 0; sounds.dialogue1.play(); bossFightState.step = 2; setTimeout(runDialogue, 1500); }
+            else if (bossFightState.step === 2) { bossFightState.step = 3; setTimeout(runDialogue, 1500); }
+            else if (bossFightState.step === 3) { sounds.dialogue2.currentTime = 0; sounds.dialogue2.play(); bossFightState.step = 4; setTimeout(runDialogue, 2500); }
+            else if (bossFightState.step === 4) {
+                bossFightState.dialogue = false;
+                bossFightState.active = true;
+                bossFightState.dialogueSeen = true;
+                boss.state = 'attacking';
+                boss.attackTimer = 120;
+                boss.tauntTimer = 180;
+                bossHud.style.display = 'inline-block';
+                sounds.bossMusic.currentTime = 0;
+                sounds.bossMusic.play();
+            }
+        }
+        function updateBoss() {
+            if (!bossFightState.active || boss.state === 'defeated') return;
+            if (player.isPoweredUp && player.x < boss.x + boss.width && player.x + player.width > boss.x && player.y < boss.y + boss.height && player.y + player.height > boss.y) {
+                boss.hp -= 50;
+                player.isPoweredUp = false; player.powerUpTimer = 0;
+                player.width = PLAYER_ORIGINAL_WIDTH; player.height = PLAYER_ORIGINAL_HEIGHT;
+            }
+            if (boss.state === 'vulnerable') {
+                boss.height = boss.originalHeight * 0.6;
+                boss.y = canvas.height - TILE_SIZE - boss.height;
+                boss.vibration = Math.sin(gameTime * 0.5) * 4;
+            } else {
+                boss.height = boss.originalHeight;
+                boss.y = canvas.height - TILE_SIZE - boss.height;
+                boss.vibration = 0;
+            }
+            if (boss.state === 'attacking') {
+                boss.powerUpSpawnTimer--;
+                if (boss.powerUpSpawnTimer <= 0) {
+                    boss.powerUpSpawnTimer = 600;
+                    if (Math.random() < 0.01 && specialPowerUps.length === 0) {
+                        const cardX = BOSS_ARENA_START_X + 100 + Math.random() * (2000 - 200);
+                        const cardY = canvas.height / 2;
+                        specialPowerUps.push({ x: cardX, y: cardY, width: 80, height: 120, type: 'poderCard' });
+                    }
+                }
+                boss.attackTimer--;
+                if (boss.attackTimer <= 0) {
+                    const attackType = Math.random();
+                    const bossCenterX = boss.x + boss.width / 2;
+                    const bossCenterY = boss.y + boss.height / 2;
+                    if (attackType < 0.25) {
+                        const angle = Math.atan2(player.y - bossCenterY, player.x - bossCenterX);
+                        hammers.push({ x: bossCenterX, y: bossCenterY, width: 60, height: 60, dx: Math.cos(angle) * 12, dy: Math.sin(angle) * 12, rotation: 0, gravityEffect: true });
+                        boss.attackTimer = 90;
+                    } else if (attackType < 0.5) {
+                        const angle = Math.atan2(player.y - bossCenterY, player.x - bossCenterX);
+                        lasers.push({ x: bossCenterX, y: bossCenterY, width: 80, height: 15, dx: Math.cos(angle) * 10, dy: Math.sin(angle) * 10, timer: 180 });
+                        boss.attackTimer = 90;
+                    } else if (attackType < 0.7) {
+                        rotatingLasers.push({ x: bossCenterX, y: bossCenterY, radius: 300, angle: Math.random() * Math.PI * 2, speed: 0.05, width: 15, timer: 300 });
+                        boss.attackTimer = 150;
+                    } else if (attackType < 0.85) {
+                        const laserSize = 40;
+                        const side = Math.floor(Math.random() * 4);
+                        let startX, startY;
+                        if (side === 0) { startX = cameraX + Math.random() * canvas.width; startY = 0 - laserSize; }
+                        else if (side === 1) { startX = cameraX + canvas.width; startY = Math.random() * canvas.height; }
+                        else if (side === 2) { startX = cameraX + Math.random() * canvas.width; startY = canvas.height; }
+                        else { startX = cameraX - laserSize; startY = Math.random() * canvas.height; }
+                        sansLasers.push({ startX: startX, startY: startY, timer: 180, fireDelay: 60, speed: 6, width: laserSize, height: laserSize, state: 'waiting', dx: 0, dy: 0 });
+                        boss.attackTimer = 120;
+                    } else {
+                        boss.state = 'vulnerable';
+                        boss.vulnerableTimer = 300;
+                    }
+                }
+                boss.tauntTimer--;
+                if (boss.tauntTimer <= 0) {
+                    const randomTaunt = bossTaunts[Math.floor(Math.random() * bossTaunts.length)];
+                    randomTaunt.currentTime = 0; randomTaunt.play();
+                    boss.tauntTimer = 180 + Math.random() * 120;
+                }
+            } else if (boss.state === 'vulnerable') {
+                boss.vulnerableTimer--;
+                if (!player.isPoweredUp && player.dy > 0 && player.y + player.height >= boss.y && player.y + player.height - player.dy <= boss.y + 20 && player.x + player.width > boss.x && player.x < boss.x + boss.width) {
+                    boss.hp -= 25;
+                    player.dy = -PLAYER_JUMP_FORCE / 1.5;
+                    boss.state = 'attacking';
+                    boss.attackTimer = 60;
+                }
+                if (boss.vulnerableTimer <= 0) {
+                    boss.state = 'attacking';
+                    boss.attackTimer = 60;
+                }
+            }
+            if(boss.hp <= 0 && boss.state !== 'defeated') {
+                boss.state = 'defeated'; sounds.bossMusic.pause(); sounds.bossMusic.currentTime = 0;
+                sounds.bossDefeat.currentTime = 0; sounds.bossDefeat.play();
+                sounds.victoryMusic.play();
+                bossFightState.active = false; score += 5000; gameWon = true;
+            }
+            hammers.forEach((h, i) => { if (h.gravityEffect) h.dy += GRAVITY / 1.5; h.x += h.dx; h.y += h.dy; h.rotation += 0.2 * Math.sign(h.dx); if (h.y > canvas.height + h.height || h.x < cameraX - h.width || h.x > cameraX + canvas.width) hammers.splice(i, 1); if (!gameWon && !player.isPoweredUp && player.state !== 'dead' && player.x < h.x + h.width && player.x + player.width > h.x && player.y < h.y + h.height && player.y + player.height > h.y) { playerHitByBoss(); hammers.splice(i, 1); } });
+            lasers.forEach((l, i) => { l.x += l.dx; l.y += l.dy; l.timer--; if (l.timer <= 0 || l.y > canvas.height + l.height || l.y < -l.height || l.x < cameraX - l.width || l.x > cameraX + canvas.width) lasers.splice(i, 1); if (!gameWon && !player.isPoweredUp && player.state !== 'dead' && player.x < l.x + l.width && player.x + player.width > l.x && player.y < l.y + l.height && player.y + player.height > l.y) { playerHitByBoss(); lasers.splice(i, 1); } });
+            rotatingLasers.forEach((rl, i) => { rl.angle += rl.speed; rl.timer--; if (rl.timer <= 0) rotatingLasers.splice(i, 1); if (!gameWon && !player.isPoweredUp && player.state !== 'dead') { const laserEndX = rl.x + Math.cos(rl.angle) * rl.radius; const laserEndY = rl.y + Math.sin(rl.angle) * rl.radius; const px = player.x + player.width/2; const py = player.y + player.height/2; const lineMag = Math.sqrt(Math.pow(laserEndX - rl.x, 2) + Math.pow(laserEndY - rl.y, 2)); let t = ((px - rl.x) * (laserEndX - rl.x) + (py - rl.y) * (laserEndY - rl.y)) / (lineMag * lineMag); t = Math.max(0, Math.min(1, t)); const closestX = rl.x + t * (laserEndX - rl.x); const closestY = rl.y + t * (laserEndY - rl.y); const dist = Math.sqrt(Math.pow(px - closestX, 2) + Math.pow(py - closestY, 2)); if (dist < player.width/2 + rl.width/2) { playerHitByBoss(); rotatingLasers.splice(i, 1); } } });
+            sansLasers.forEach((sl, i) => { if (sl.state === 'waiting') { sl.timer--; if (sl.timer <= 0) { sl.state = 'firing'; const angle = Math.atan2((player.y + player.height/2) - sl.startY, (player.x + player.width/2) - sl.startX); sl.dx = Math.cos(angle) * sl.speed; sl.dy = Math.sin(angle) * sl.speed; sl.timer = 180; } } else if (sl.state === 'firing') { sl.startX += sl.dx; sl.startY += sl.dy; sl.timer--; if (sl.timer <= 0 || sl.startY > canvas.height + sl.height || sl.startY < -sl.height || sl.startX < cameraX - sl.width || sl.startX > cameraX + canvas.width) sansLasers.splice(i, 1); if (!gameWon && !player.isPoweredUp && player.state !== 'dead' && player.x < sl.startX + sl.width && player.x + player.width > sl.startX && player.y < sl.startY + sl.height && player.y + player.height > sl.startY) { playerHitByBoss(); sansLasers.splice(i, 1); } } });
+        }
+        function playerHitByBoss() {
+            if (player.state === 'dead' || player.isPoweredUp) return;
+            sounds.playerHit.currentTime = 0; sounds.playerHit.play();
+            player.state = 'dead';
+            player.dy = -PLAYER_JUMP_FORCE / 2;
+            player.dx = (player.x < boss.x + boss.width / 2 ? -1 : 1) * PLAYER_MOVE_SPEED / 2;
+            if (lives > 1) { sounds.playerDeathBoss.currentTime = 0; sounds.playerDeathBoss.play(); }
+        }
+        function handleDeath() {
+            let inBossFight = boss.isSpawned;
+            lives--;
+            if (lives <= 0) {
+                isGameRunning = false;
+                Object.values(sounds).forEach(sound => { sound.pause(); sound.currentTime = 0; });
+                resetButton.style.display = 'inline-block'; startButton.style.display = 'none'; bossHud.style.display = 'none';
+                setTimeout(() => alert(`FIM DE JOGO! Pontuação: ${score}`), 200);
+            } else {
+                if (inBossFight) {
+                    player.x = BOSS_ARENA_START_X + 100;
+                    player.y = canvas.height - TILE_SIZE * 5;
+                    resetBoss();
+                    boss.isSpawned = true;
+                    if (bossFightState.dialogueSeen) {
+                        bossFightState.active = true;
+                        boss.state = 'attacking';
+                        boss.attackTimer = 60;
+                        bossHud.style.display = 'inline-block';
+                        sounds.bossMusic.currentTime = 0;
+                        sounds.bossMusic.play();
+                    } else {
+                        boss.state = 'idle';
+                        bossFightState.active = false;
+                        bossHud.style.display = 'none';
+                    }
+                    bossFightState.dialogue = false;
+                    bossFightState.step = 0;
+                } else {
+                    player.x = 100 + cameraX;
+                    player.y = canvas.height - TILE_SIZE * 5;
+                    if (!sounds.bgmMusic.paused) { sounds.bgmMusic.currentTime = 0; sounds.bgmMusic.play(); }
+                }
+                player.dy = 0; player.dx = 0; player.onGround = false; player.state = 'idle';
+            }
+        }
+        function startGame() {
+            if (assetsLoaded < totalAssets || !player.spriteData.walking || !player.spriteData.jump) { alert("Assets ainda carregando..."); return; }
+            isGameRunning = true; 
+            generateInitialMap(); 
+            updateHUD();
+            startButton.style.display = 'none'; 
+            resetButton.style.display = 'inline-block'; 
+            bossHud.style.display = 'none';
+            sounds.bgmMusic.play().catch(e => console.error("Erro ao tocar BGM:", e));
+            gameLoop();
+        }
+        function resetGame() {
+            isGameRunning = false;
+            Object.values(sounds).forEach(sound => { sound.pause(); sound.currentTime = 0; });
+            setTimeout(() => {
+                startButton.style.display = 'inline-block'; resetButton.style.display = 'none';
+                bossHud.style.display = 'none'; score = 0; lives = 3; player.state = 'idle'; updateHUD();
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }, 100);
+        }
+        function drawPlayer() {
+            ctx.save();
+            const drawX = player.x - cameraX;
+            if (player.direction === 'left') { ctx.scale(-1, 1); ctx.translate(-(drawX + player.width), 0); }
+            else { ctx.translate(drawX, 0); }
+            let sheet = images.idle, sx=0, sy=0, sw=0, sh=0;
+            if (player.state === 'dead') sheet = images.death;
+            else if (player.state !== 'idle') {
+                const animType = (player.state === 'jumping' || player.state === 'falling') ? 'jump' : 'walking';
+                if (player.spriteData[animType]) {
+                    sheet = images[animType];
+                    const frameIndex = Math.min(player.animationFrame, player.spriteData[animType].sprites.length - 1);
+                    const frameInfo = player.spriteData[animType].sprites[frameIndex];
+                    if (frameInfo) { sx=frameInfo.x; sy=frameInfo.y; sw=frameInfo.width; sh=frameInfo.height; }
+                }
+            }
+            if (sheet && sheet.complete) {
+                if(sw === 0 || sh === 0) { sw = sheet.naturalWidth; sh = sheet.naturalHeight; }
+                const drawY = player.isPoweredUp ? player.y - (player.height - PLAYER_ORIGINAL_HEIGHT) : player.y;
+                ctx.drawImage(sheet, sx, sy, sw, sh, 0, drawY, player.width, player.height);
+                if (player.isPoweredUp) {
+                    ctx.globalCompositeOperation = 'source-atop';
+                    ctx.fillStyle = 'rgba(128, 0, 128, 0.5)';
+                    ctx.fillRect(0, drawY, player.width, player.height);
+                }
+            }
+            ctx.restore();
+        }
+        function drawMap() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            platforms.forEach(p => { if (images.grass.complete) ctx.drawImage(images.grass, p.x - cameraX, p.y, p.width, p.height);});
+            powerUpBlocks.forEach(b => { const img = (b.visualHit && images.starblock_hit.complete) ? images.starblock_hit : images.starblock; if (img.complete) ctx.drawImage(img, b.x - cameraX, b.y, b.width, b.height); });
+            powerUps.forEach(pu => {
+                let img;
+                if(pu.type === 'farofa') img = images.farofa;
+                if(pu.type === 'bleach') img = images.bleach;
+                if (img && img.complete) ctx.drawImage(img, pu.x - cameraX, pu.y, pu.width, pu.height);
+            });
+            trampolines.forEach(t => { if (images.trampoline.complete) ctx.drawImage(images.trampoline, t.x - cameraX, t.y, t.width, t.height);});
+            specialObjects.forEach(o => { if(o.type === 'placa' && images.placa.complete) ctx.drawImage(images.placa, o.x - cameraX, o.y, o.width, o.height); });
+            specialPowerUps.forEach(spu => { if (images.poderCard.complete) ctx.drawImage(images.poderCard, spu.x - cameraX, spu.y, spu.width, spu.height); });
+            bleachProjectiles.forEach(proj => { ctx.fillStyle = 'white'; ctx.fillRect(proj.x - cameraX, proj.y, proj.width, proj.height); });
+            enemies.forEach(e => { if (images.goomba.complete) ctx.drawImage(images.goomba, e.x - cameraX, e.y, e.width, e.height);});
+        }
+        function drawBoss() {
+            if (!boss.isSpawned || boss.state === 'defeated') return;
+            if(images.zoio.complete) { ctx.drawImage(images.zoio, boss.x - cameraX + boss.vibration, boss.y - boss.vibration, boss.width, boss.height); }
+            hammers.forEach(h => { ctx.save(); ctx.translate(h.x - cameraX + h.width/2, h.y + h.height/2); ctx.rotate(h.rotation); if (images.marreta.complete) ctx.drawImage(images.marreta, -h.width/2, -h.height/2, h.width, h.height); ctx.restore(); });
+            lasers.forEach(l => { ctx.fillStyle = 'rgba(255, 0, 0, 0.7)'; ctx.fillRect(l.x - cameraX, l.y, l.width, l.height); });
+            rotatingLasers.forEach(rl => { ctx.save(); ctx.translate(rl.x - cameraX, rl.y); ctx.rotate(rl.angle); ctx.fillStyle = 'rgba(0, 255, 0, 0.7)'; ctx.fillRect(0, -rl.width / 2, rl.radius, rl.width); ctx.restore(); });
+            sansLasers.forEach(sl => { const alpha = sl.state === 'waiting' ? (60 - sl.timer) / 60 : 0.9; ctx.fillStyle = `rgba(0, 200, 255, ${alpha})`; ctx.fillRect(sl.startX - cameraX, sl.startY, sl.width, sl.height); });
+        }
+        function drawDialogue() {
+            if (!bossFightState.dialogue) return;
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.7)'; ctx.fillRect(50, canvas.height - 120, canvas.width - 100, 100);
+            ctx.fillStyle = 'white'; ctx.font = "18px 'Press Start 2P'"; ctx.textAlign = 'center';
+            let text = "";
+            if (bossFightState.step === 1) text = "Nego: oh ya"; else if (bossFightState.step === 2) text = "Zoio: e so isso?";
+            else if (bossFightState.step === 3) text = "Nego: yaya"; else if (bossFightState.step === 4) text = "Zoio: EU VOU PEGAR MINHA MARRETA!!";
+            ctx.fillText(text, canvas.width / 2, canvas.height - 120 + 60);
+        }
+        function drawWinScreen() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.9)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#f1c40f'; ctx.font = "40px 'Press Start 2P'"; ctx.textAlign = 'center';
+            ctx.fillText("VOCE VENCEU!", canvas.width / 2, canvas.height / 2 - 150);
+            ctx.fillStyle = 'white'; ctx.font = "16px 'Press Start 2P'"; ctx.textAlign = 'left';
+            const startY = canvas.height / 2 - 80; const lineHeight = 30;
+            const timeInSeconds = Math.floor(gameTime / 60); const minutes = Math.floor(timeInSeconds / 60); const seconds = timeInSeconds % 60;
+            const distanceInTiles = Math.floor(stats.distanceWalked / TILE_SIZE);
+            ctx.fillText(`Tempo: ${minutes}m ${seconds}s`, canvas.width / 2 - 250, startY);
+            ctx.fillText(`Pontuacao Final: ${score}`, canvas.width / 2 - 250, startY + lineHeight);
+            ctx.fillText(`Inimigos Pisados: ${stats.enemiesStomped}`, canvas.width / 2 - 250, startY + lineHeight * 2);
+            ctx.fillText(`Powerups Saboreados: ${stats.powerupsCollected}`, canvas.width / 2 - 250, startY + lineHeight * 3);
+            ctx.fillText(`Pulos Normais: ${stats.jumps}`, canvas.width / 2 - 250, startY + lineHeight * 4);
+            ctx.fillText(`Pulos no Trampolim: ${stats.trampolineJumps}`, canvas.width / 2 - 250, startY + lineHeight * 5);
+            ctx.fillText(`Distancia Percorrida: ${distanceInTiles} tiles`, canvas.width / 2 - 250, startY + lineHeight * 6);
+            resetButton.style.display = 'inline-block';
+        }
+        function gameLoop() {
+            if (!isGameRunning) return;
+            
+            if (gameWon) {
+                drawWinScreen();
+                requestAnimationFrame(gameLoop);
+                return; // Para o tempo e outras lógicas
+            }
+
+            gameTime++;
+            handleInput();
+            if(!bossFightState.dialogue) { updatePlayer(); updateEnemies(); updateItems(); updateBoss(); }
+            generateMapIfNeeded();
+            drawMap(); drawBoss(); drawPlayer(); drawDialogue();
+            updateHUD();
+            requestAnimationFrame(gameLoop);
+        }
+
+        // --- CONTROLES DE TELA CHEIA E INÍCIO DO JOGO ---
+        const fullscreenStretchBtn = document.getElementById('fullscreen-stretch-btn');
+        const fullscreenAspectBtn = document.getElementById('fullscreen-aspect-btn');
+        const fullscreenExitBtn = document.getElementById('fullscreen-exit-btn');
+
+        function enterFullscreen(mode) {
+            document.body.classList.add('fullscreen-mode');
+            if (mode === 'stretch') {
+                document.body.classList.add('fullscreen-stretch');
+            } else {
+                document.body.classList.add('fullscreen-aspect');
+            }
+            const elem = document.documentElement;
+            if (elem.requestFullscreen) { elem.requestFullscreen(); } 
+            else if (elem.webkitRequestFullscreen) { elem.webkitRequestFullscreen(); } 
+            else if (elem.msRequestFullscreen) { elem.msRequestFullscreen(); }
+        }
+
+        function exitFullscreen() {
+            if (document.exitFullscreen) { document.exitFullscreen(); } 
+            else if (document.webkitExitFullscreen) { document.webkitExitFullscreen(); } 
+            else if (document.msExitFullscreen) { document.msExitFullscreen(); }
+        }
+
+        function onFullscreenChange() {
+            if (!document.fullscreenElement) {
+                document.body.classList.remove('fullscreen-mode', 'fullscreen-stretch', 'fullscreen-aspect');
+                fullscreenStretchBtn.style.display = 'inline-block';
+                fullscreenAspectBtn.style.display = 'inline-block';
+                fullscreenExitBtn.style.display = 'none';
+            } else {
+                fullscreenStretchBtn.style.display = 'none';
+                fullscreenAspectBtn.style.display = 'none';
+                fullscreenExitBtn.style.display = 'inline-block';
+            }
+        }
+        
+        fullscreenStretchBtn.addEventListener('click', () => enterFullscreen('stretch'));
+        fullscreenAspectBtn.addEventListener('click', () => enterFullscreen('aspect'));
+        fullscreenExitBtn.addEventListener('click', exitFullscreen);
+        document.addEventListener('fullscreenchange', onFullscreenChange);
+
+        startButton.addEventListener('click', startGame);
+        resetButton.addEventListener('click', resetGame);
+    </script>
+</body>
+</html>

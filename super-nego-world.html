@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Super Nego World - Jalambi Pinto Entertainment</title>
+    <link rel="shortcut icon" href="images/favicon.ico">
+    <link rel="icon" sizes="64x64" href="images/favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --main-bg-color: #2c3e50;
+        }
+        body { margin: 0; padding: 0; background-color: var(--main-bg-color); display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; font-family: 'Poppins', sans-serif; color: white; overflow: hidden; }
+        .game-wrapper { text-align: center; position: relative; width: 800px; height: 600px; background-color: #000; }
+        #gameCanvas { border: 3px solid #ecf0f1; background-color: #3498db; image-rendering: pixelated; -ms-interpolation-mode: nearest-neighbor; display: block; width: 100%; height: 100%; }
+        
+        /* --- INTRO & MENU --- */
+        .intro-video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: fill; z-index: 200; }
+        #initial-prompt { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 300; display: flex; justify-content: center; align-items: center; font-family: 'Press Start 2P', cursive; font-size: 1.5em; color: white; cursor: pointer; }
+        #main-menu { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 150; display: flex; flex-direction: column; justify-content: center; align-items: center; background-image: url('images/SNWtitle.png'); background-size: cover; background-position: center; }
+        .menu-options { margin-top: 250px; animation: fadeIn 1s ease-in-out forwards; opacity: 0; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- SETTINGS MENU --- */
+        #settings-menu { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 160; background-color: rgba(0,0,0,0.8); display: flex; justify-content: center; align-items: center; }
+        .settings-panel { background-color: #2c3e50; padding: 30px; border-radius: 10px; border: 3px solid #ecf0f1; text-align: left; width: 70%; max-width: 500px; }
+        .settings-panel h2 { font-family: 'Press Start 2P'; text-align: center; margin-top: 0; margin-bottom: 30px; color: #ff6b00; }
+        .settings-section { margin-bottom: 25px; }
+        .settings-section h3 { font-family: 'Press Start 2P'; font-size: 0.9em; margin-bottom: 10px; color: #f1c40f; }
+        .keybind-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .keybind-row label { font-family: 'Poppins'; font-size: 1em; }
+        .keybind-input { font-family: 'Press Start 2P'; width: 100px; padding: 5px; text-align: center; background-color: #34495e; color: white; border: 1px solid #7f8c8d; border-radius: 3px; }
+
+        /* --- HUD & GAME BUTTONS --- */
+        .hud { font-family: 'Press Start 2P', cursive; margin-top: 15px; font-size: 1.2em; color: #f1c40f; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 100%; text-align: center; background: rgba(0,0,0,0.3); padding: 5px 0; z-index: 10; }
+        .hud span { color: #ffffff; }
+        .controls-info { margin-top: 20px; font-size: 0.9em; color: #bdc3c7; position: absolute; bottom: 70px; left: 50%; transform: translateX(-50%); z-index: 10; }
+        .controls-info p { margin: 5px 0; }
+        .game-buttons button, .menu-btn, .settings-btn { font-family: 'Press Start 2P', cursive; background-color: #e74c3c; color: white; border: none; padding: 15px 30px; font-size: 1.2em; cursor: pointer; border-radius: 5px; text-shadow: 2px 2px #000; transition: background-color 0.2s; margin: 10px 5px; }
+        .game-buttons button:hover, .menu-btn:hover, .settings-btn:hover { background-color: #c0392b; }
+        .settings-btn { font-size: 0.8em; padding: 10px 20px; margin: 5px; }
+        .settings-btn.active { background-color: #27ae60; }
+        .back-to-site-btn { font-family: 'Press Start 2P', cursive; background-color: #7f8c8d; color: white; border: none; padding: 10px 20px; font-size: 0.9em; cursor: pointer; border-radius: 5px; text-shadow: 1px 1px #000; transition: background-color 0.2s; margin: 10px 5px 0 5px; position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); }
+        .back-to-site-btn:hover { background-color: #525c60; }
+        h1 { font-family: 'Press Start 2P', cursive; color: #ff6b00; margin-bottom: 10px; font-size: 2em; }
+        .hidden { display: none !important; }
+
+        /* --- ESTILOS DE TELA CHEIA --- */
+        body.fullscreen-mode { background: #000; }
+        body.fullscreen-mode .game-wrapper { width: 100%; height: 100vh; border: none; }
+        body.fullscreen-mode .back-to-site-btn, body.fullscreen-mode h1 { display: none; }
+        body.fullscreen-stretch #gameCanvas, body.fullscreen-stretch .intro-video, body.fullscreen-stretch #main-menu { width: 100%; height: 100%; border: none; object-fit: fill; }
+        body.fullscreen-aspect .game-wrapper { display: flex; justify-content: center; align-items: center; }
+        body.fullscreen-aspect #gameCanvas, body.fullscreen-aspect .intro-video, body.fullscreen-aspect #main-menu { width: 100%; height: 100%; object-fit: contain; border: none; }
+        
+        /* --- ESTILOS CONTROLES MOBILE --- */
+        #mobile-controls { display: none; position: fixed; bottom: 20px; left: 0; width: 100%; height: 120px; z-index: 100; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+        .mobile-dpad { position: absolute; left: 20px; bottom: 0; }
+        .mobile-actions { position: absolute; right: 20px; bottom: 0; }
+        .mobile-btn { width: 70px; height: 70px; background-color: rgba(255, 255, 255, 0.3); border: 2px solid rgba(255, 255, 255, 0.5); border-radius: 50%; display: inline-flex; justify-content: center; align-items: center; margin: 0 10px; font-family: 'Press Start 2P'; font-size: 1.5em; color: white; }
+        .mobile-btn:active { background-color: rgba(255, 255, 255, 0.6); }
+        #action-btn-a { bottom: 0; }
+        #action-btn-b { bottom: 50px; right: 90px; }
+    </style>
+</head>
+<body>
+    <h1 id="game-title">SUPER NEGO WORLD</h1>
+    <div class="game-wrapper">
+        <!-- Intro Videos -->
+        <div id="initial-prompt">Clique para Iniciar</div>
+        <video id="fmvVideo" class="intro-video hidden" src="https://files.catbox.moe/34xgmp.mp4" playsinline></video>
+        <video id="introMenuVideo" class="intro-video hidden" src="https://files.catbox.moe/vxq5nu.mp4" playsinline></video>
+
+        <!-- Main Menu -->
+        <div id="main-menu" class="hidden">
+            <div class="menu-options">
+                <button id="playBtn" class="menu-btn">Jogar</button>
+                <button id="settingsBtn" class="menu-btn">Configuração</button>
+            </div>
+        </div>
+
+        <!-- Settings Menu -->
+        <div id="settings-menu" class="hidden">
+            <div class="settings-panel">
+                <h2>Configurações</h2>
+                <div class="settings-section">
+                    <h3>Qualidade Gráfica</h3>
+                    <button id="graphics-hq-btn" class="settings-btn active">HQ</button>
+                    <button id="graphics-sd-btn" class="settings-btn">SD</button>
+                </div>
+                <div class="settings-section">
+                    <h3>Mapeamento de Teclas (WIP)</h3>
+                    <div class="keybind-row"><label for="key-left">Esquerda:</label><input type="text" id="key-left" class="keybind-input" value="A" readonly></div>
+                    <div class="keybind-row"><label for="key-right">Direita:</label><input type="text" id="key-right" class="keybind-input" value="D" readonly></div>
+                    <div class="keybind-row"><label for="key-jump">Pular:</label><input type="text" id="key-jump" class="keybind-input" value="ESPAÇO" readonly></div>
+                    <div class="keybind-row"><label for="key-attack">Atacar:</label><input type="text" id="key-attack" class="keybind-input" value="E" readonly></div>
+                </div>
+                <div style="text-align: center; margin-top: 30px;">
+                    <button id="settings-back-btn" class="menu-btn" style="font-size: 1em;">Voltar</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Elements -->
+        <canvas id="gameCanvas" width="800" height="600"></canvas>
+        <div class="hud hidden">
+            Moedas: <span id="score">0</span> | Vidas: <span id="lives">3</span> | <span id="ammo-label">Munição</span>: <span id="ammo-display">0</span>
+            <span id="boss-hud" style="display:none; margin-left: 10px;">| EDNALDO HP: <span id="boss-hp">100</span></span>
+        </div>
+        <div class="controls-info hidden">
+            <p>Use A/D, Setas ou Controle para Mover</p>
+            <p>Espaço para Pular/Pulo Duplo | E para Atacar</p>
+        </div>
+        <div class="game-buttons">
+            <button id="startButton" class="hidden">Iniciar</button>
+            <button id="resetButton" class="hidden">Resetar</button>
+            <button id="fullscreen-stretch-btn">Fullscreen (Adaptado)</button>
+            <button id="fullscreen-aspect-btn">Fullscreen (Proporcional)</button>
+            <button id="fullscreen-exit-btn" class="hidden">Sair da Tela Cheia</button>
+        </div>
+    </div>
+    <a href="index.html" class="back-to-site-btn">Voltar ao Site Principal</a>
+
+    <!-- Interface Mobile -->
+    <div id="mobile-controls" class="hidden">
+        <div class="mobile-dpad">
+            <div id="mobile-left" class="mobile-btn">◀</div>
+            <div id="mobile-right" class="mobile-btn">▶</div>
+        </div>
+        <div class="mobile-actions">
+            <div id="mobile-attack" class="mobile-btn" style="position: absolute; bottom: 0;">E</div>
+            <div id="mobile-jump" class="mobile-btn" style="position: absolute; bottom: 50px; right: 90px;">↑</div>
+        </div>
+    </div>
+
+    <script>
+        // --- DOM ELEMENTS ---
+        const gameWrapper = document.querySelector('.game-wrapper');
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const scoreDisplay = document.getElementById('score');
+        const livesDisplay = document.getElementById('lives');
+        const ammoLabel = document.getElementById('ammo-label');
+        const ammoDisplay = document.getElementById('ammo-display');
+        const startButton = document.getElementById('startButton');
+        const resetButton = document.getElementById('resetButton');
+        const bossHud = document.getElementById('boss-hud');
+        const bossHpDisplay = document.getElementById('boss-hp');
+
+        // Intro & Menu Elements
+        const initialPrompt = document.getElementById('initial-prompt');
+        const fmvVideo = document.getElementById('fmvVideo');
+        const introMenuVideo = document.getElementById('introMenuVideo');
+        const mainMenu = document.getElementById('main-menu');
+        const settingsMenu = document.getElementById('settings-menu');
+        const playBtn = document.getElementById('playBtn');
+        const settingsBtn = document.getElementById('settingsBtn');
+        const settingsBackBtn = document.getElementById('settings-back-btn');
+        const graphicsHqBtn = document.getElementById('graphics-hq-btn');
+        const graphicsSdBtn = document.getElementById('graphics-sd-btn');
+        const allHudElements = document.querySelectorAll('.hud, .controls-info, #mobile-controls');
+
+        // --- GRAPHICS QUALITY ---
+        let graphicsQuality = 'hq';
+        const offscreenCanvas = document.createElement('canvas');
+        const offscreenCtx = offscreenCanvas.getContext('2d');
+        ctx.imageSmoothingEnabled = false;
+
+        function setGraphicsQuality(quality) {
+            graphicsQuality = quality;
+            if (quality === 'hq') {
+                offscreenCanvas.width = 800;
+                offscreenCanvas.height = 600;
+                graphicsHqBtn.classList.add('active');
+                graphicsSdBtn.classList.remove('active');
+            } else { // 'sd'
+                offscreenCanvas.width = 640;
+                offscreenCanvas.height = 480;
+                graphicsHqBtn.classList.remove('active');
+                graphicsSdBtn.classList.add('active');
+            }
+        }
+        setGraphicsQuality('hq'); // Default
+
+        // --- CONSTANTES ---
+        const GRAVITY = 0.7;
+        const PLAYER_MOVE_SPEED = 6;
+        const PLAYER_JUMP_FORCE = 16;
+        const TILE_SIZE = 50;
+        const BOSS_ARENA_START_X = 6000;
+        const BOSS_ARENA_WIDTH = 40 * TILE_SIZE;
+        const BOSS_ARENA_END_X = BOSS_ARENA_START_X + BOSS_ARENA_WIDTH;
+        const PLAYER_ORIGINAL_WIDTH = TILE_SIZE * 1.5;
+        const PLAYER_ORIGINAL_HEIGHT = TILE_SIZE * 2.2;
+
+        // --- VARIÁVEIS DE ESTADO DO JOGO ---
+        let score = 0;
+        let lives = 3;
+        let isGameRunning = false;
+        let cameraX = 0;
+        let gameWon = false;
+        let currentScreen = 'prompt'; // prompt, fmv, intro, menu, settings, game
+
+        const player = { x: 100, y: offscreenCanvas.height - TILE_SIZE - 150, width: PLAYER_ORIGINAL_WIDTH, height: PLAYER_ORIGINAL_HEIGHT, dx: 0, dy: 0, onGround: false, state: 'idle', direction: 'right', animationFrame: 0, animationTimer: 0, animationBaseSpeed: 5, get currentAnimationSpeed() { if (this.state === 'walking') return this.animationBaseSpeed / 1.5; if (this.state === 'jumping' || this.state === 'falling') return this.animationBaseSpeed * 1.2; return this.animationBaseSpeed; }, spriteSheets: {}, spriteData: {}, currentFrameData: null, bleachAmmo: 0, canDoubleJump: false };
+        
+        // --- ASSETS ---
+        const images = { 
+            walking: new Image(), jump: new Image(), idle: new Image(), death: new Image(), 
+            grass: new Image(), starblock: new Image(), starblock_hit: new Image(), 
+            goomba: new Image(), farofa: new Image(), trampoline: new Image(), 
+            parallaxBg: new Image(), parallaxFg1: new Image(), parallaxFg2: new Image(),
+            ednaldo: new Image(), banidu: new Image(), spike: new Image(), 
+            bleach: new Image(), boneGun: new Image()
+        };
+        const sounds = {
+            menuMusic: new Audio('https://files.catbox.moe/c521bb.mp3'),
+            bgmMusic: new Audio('https://files.catbox.moe/bvwodo.mp3'),
+            bossMusic: new Audio('https://files.catbox.moe/bp05oo.mp3'),
+            bossDialogue1: new Audio('https://files.catbox.moe/dxs1zo.mp3'),
+            bossDialogue2: new Audio('https://files.catbox.moe/ccojr4.mp3'),
+            bossPlayerKill: new Audio('https://files.catbox.moe/5yj1v3.mp3'),
+            bossTaunt1: new Audio('https://files.catbox.moe/bu2yl8.mp3'),
+            bossTaunt2: new Audio('https://files.catbox.moe/y6zcgr.mp3'),
+            bossTaunt3: new Audio('https://files.catbox.moe/8osg98.mp3'),
+            bossTaunt4: new Audio('https://files.catbox.moe/qkn1bs.mp3'),
+            victoryMusic: new Audio('https://files.catbox.moe/aog0ru.mp3'),
+            playerDeathGeneric: new Audio('https://files.catbox.moe/w3mtpu.mp3'),
+            playerPowerup: new Audio('https://files.catbox.moe/ljuguk.mp3'),
+            bleachAttack: new Audio('https://files.catbox.moe/tzmxzq.mp3'),
+            playerJump: new Audio('https://files.catbox.moe/qps6ai.mp3'),
+            trampolineJump: new Audio('https://files.catbox.moe/e67fwz.mp3'),
+            bossDefeat: new Audio('https://files.catbox.moe/pdghhb.mp3')
+        };
+        sounds.bgmMusic.loop = true;
+        sounds.bossMusic.loop = true;
+        sounds.menuMusic.loop = true;
+        const bossTaunts = [sounds.bossTaunt1, sounds.bossTaunt2, sounds.bossTaunt3, sounds.bossTaunt4];
+
+        let assetsLoaded = 0;
+        const totalAssets = Object.keys(images).length;
+        function assetLoaded() { assetsLoaded++; if (assetsLoaded === totalAssets) { loadSpriteData(); } }
+
+        Object.keys(images).forEach(key => images[key].onload = assetLoaded);
+        images.walking.src = 'images/negoman_spritesheet_walking.png';
+        images.jump.src = 'images/negoman_spritesheet_jump.png';
+        images.idle.src = 'images/negoman_idle.png';
+        images.death.src = 'images/negoman_death.png';
+        images.grass.src = 'images/grass.png';
+        images.starblock.src = 'images/starblock.png';
+        images.starblock_hit.src = 'images/starblock_hit.png';
+        images.goomba.src = 'images/pija_ruim.png';
+        images.farofa.src = 'images/farofa.png';
+        images.trampoline.src = 'images/trampoline.png';
+        images.parallaxBg.src = 'images/parallax-bg.png';
+        images.parallaxFg1.src = 'images/parallax-fg2.png';
+        images.parallaxFg2.src = 'images/parallax-fg1.png';
+        images.ednaldo.src = 'images/ednaldo_pereira.png';
+        images.banidu.src = 'images/banidu.png';
+        images.spike.src = 'images/espinhos.png';
+        images.bleach.src = 'images/agua_sanitaria.png';
+        images.boneGun.src = 'images/12_de_osso.png';
+
+        async function loadSpriteData() {
+            try {
+                const [walkingResponse, jumpResponse] = await Promise.all([fetch('js/walking.json'), fetch('js/jump.json')]);
+                player.spriteData.walking = await walkingResponse.json();
+                player.spriteData.jump = await jumpResponse.json();
+                console.log("Assets e JSONs carregados.");
+            } catch (error) { console.error("Erro ao carregar spritesheets:", error); }
+        }
+        
+        // --- SCREEN MANAGEMENT ---
+        function showScreen(screen) {
+            currentScreen = screen;
+            // Hide all screens first
+            initialPrompt.classList.add('hidden');
+            fmvVideo.classList.add('hidden');
+            introMenuVideo.classList.add('hidden');
+            mainMenu.classList.add('hidden');
+            settingsMenu.classList.add('hidden');
+            canvas.style.visibility = 'hidden';
+            allHudElements.forEach(el => el.classList.add('hidden'));
+
+            switch (screen) {
+                case 'prompt':
+                    initialPrompt.classList.remove('hidden');
+                    break;
+                case 'fmv':
+                    fmvVideo.classList.remove('hidden');
+                    fmvVideo.muted = false; // <<< CORREÇÃO: Unmute antes de tocar
+                    fmvVideo.play().catch(e => console.error("FMV play error:", e));
+                    break;
+                case 'intro':
+                    introMenuVideo.classList.remove('hidden');
+                    introMenuVideo.muted = false; // <<< CORREÇÃO: Unmute antes de tocar
+                    introMenuVideo.play().catch(e => console.error("Intro play error:", e));
+                    break;
+                case 'menu':
+                    mainMenu.classList.remove('hidden');
+                    sounds.menuMusic.play().catch(e => console.log("Menu music blocked"));
+                    break;
+                case 'settings':
+                    settingsMenu.classList.remove('hidden');
+                    break;
+                case 'game':
+                    canvas.style.visibility = 'visible';
+                    allHudElements.forEach(el => el.classList.remove('hidden'));
+                    resetButton.classList.remove('hidden');
+                    sounds.menuMusic.pause();
+                    sounds.bgmMusic.play().catch(e => console.error("Erro ao tocar BGM:", e));
+                    break;
+            }
+        }
+
+        // --- GAME LOGIC (Functions like playerAttack, handleInput, etc. go here) ---
+        // (Copied the entire block of your game logic functions from the original file)
+        // ... [START OF COPIED BLOCK] ...
+        let platforms = [], enemies = [], powerUpBlocks = [], powerUps = [], trampolines = [], bleachProjectiles = [], baniduBalls = [], groundSpikes = [];
+        let ednaldoBoss = {};
+        let bossFightState = { active: false, dialogue: false, step: 0, dialogueSeen: false };
+        let lastGamepadAttackState = false;
+        let jumpKeyPressed = false;
+
+        function playerAttack() {
+            if (player.state === 'dead') return;
+            if (player.bleachAmmo > 0 && !bossFightState.dialogue && isGameRunning) {
+                player.bleachAmmo--;
+                sounds.bleachAttack.currentTime = 0;
+                sounds.bleachAttack.play();
+                const projectileSpeed = 10;
+                bleachProjectiles.push({
+                    x: player.x + player.width / 2,
+                    y: player.y + player.height / 2,
+                    width: 20, height: 10,
+                    dx: player.direction === 'right' ? projectileSpeed : -projectileSpeed,
+                    life: 60
+                });
+            }
+        }
+
+        const keys = {};
+        document.addEventListener('keydown', (e) => {
+            if (currentScreen !== 'game') return;
+            const key = e.key.toLowerCase();
+            if (!keys[key]) {
+                keys[key] = true;
+                if (key === 'e') { playerAttack(); }
+                if ((key === ' ' || key === 'w' || key === 'arrowup')) {
+                    if (player.state === 'dead') return;
+                    if (player.onGround) {
+                        player.dy = -PLAYER_JUMP_FORCE;
+                        player.onGround = false;
+                        player.state = 'jumping';
+                        player.animationFrame = 0;
+                        sounds.playerJump.currentTime = 0;
+                        sounds.playerJump.play();
+                        player.canDoubleJump = true;
+                    } else if (player.canDoubleJump) {
+                        player.dy = -PLAYER_JUMP_FORCE * 0.9;
+                        player.state = 'jumping';
+                        player.animationFrame = 0;
+                        sounds.playerJump.currentTime = 0;
+                        sounds.playerJump.play();
+                        player.canDoubleJump = false;
+                    }
+                }
+            }
+        });
+        document.addEventListener('keyup', (e) => {
+            if (currentScreen !== 'game') return;
+            keys[e.key.toLowerCase()] = false;
+        });
+        
+        function handleGamepadInput() {
+            if (currentScreen !== 'game') return;
+            const gamepads = navigator.getGamepads();
+            if (!gamepads || !gamepads[0]) return;
+            const gp = gamepads[0];
+
+            const horizontalAxis = gp.axes[0];
+            const dpadLeft = gp.buttons[14] && gp.buttons[14].pressed;
+            const dpadRight = gp.buttons[15] && gp.buttons[15].pressed;
+            keys['a'] = horizontalAxis < -0.5 || dpadLeft;
+            keys['d'] = horizontalAxis > 0.5 || dpadRight;
+
+            const jumpPressed = gp.buttons[0] && gp.buttons[0].pressed;
+            if (jumpPressed && !jumpKeyPressed) {
+                if (player.state === 'dead') return;
+                if (player.onGround) {
+                    player.dy = -PLAYER_JUMP_FORCE; player.onGround = false; player.state = 'jumping';
+                    player.animationFrame = 0; sounds.playerJump.play(); player.canDoubleJump = true;
+                } else if (player.canDoubleJump) {
+                    player.dy = -PLAYER_JUMP_FORCE * 0.9; player.state = 'jumping';
+                    player.animationFrame = 0; sounds.playerJump.play(); player.canDoubleJump = false;
+                }
+            }
+            jumpKeyPressed = jumpPressed;
+
+            const attackPressed = gp.buttons[2] && gp.buttons[2].pressed;
+            if (attackPressed && !lastGamepadAttackState) { playerAttack(); }
+            lastGamepadAttackState = attackPressed;
+        }
+
+        function handleInput() {
+            handleGamepadInput();
+            if (player.state === 'dead' || bossFightState.dialogue || gameWon) {
+                player.dx = 0;
+                return;
+            }
+            
+            player.dx = 0;
+            if (keys['a'] || keys['arrowleft']) { player.dx = -PLAYER_MOVE_SPEED; player.direction = 'left'; if (player.onGround) player.state = 'walking'; }
+            if (keys['d'] || keys['arrowright']) { player.dx = PLAYER_MOVE_SPEED; player.direction = 'right'; if (player.onGround) player.state = 'walking'; }
+            
+            if(player.dx === 0 && player.onGround && player.state !== 'idle' && player.state !== 'jumping' && player.state !== 'falling'){ player.state = 'idle'; }
+        }
+        
+        function resetBoss() {
+            const originalY = offscreenCanvas.height - TILE_SIZE - 300;
+            ednaldoBoss = { 
+                x: BOSS_ARENA_START_X + 1000, y: originalY, originalY: originalY,
+                width: 200, height: 300, hp: 100, maxHp: 100, 
+                state: 'idle', isSpawned: false, 
+                attackTimer: 180, tauntTimer: 240, vibration: 0,
+                vulnerableTimer: 0, attackCount: 0
+            };
+            baniduBalls = []; groundSpikes = []; bleachProjectiles = [];
+            enemies = enemies.filter(e => e.x < BOSS_ARENA_START_X);
+        }
+
+        function generateInitialMap() {
+            platforms = []; enemies = []; powerUpBlocks = []; powerUps = []; trampolines = [];
+            player.x = 100; player.y = offscreenCanvas.height - TILE_SIZE - player.height;
+            player.dx = 0; player.dy = 0; player.onGround = false; player.state = 'idle';
+            player.bleachAmmo = 0; player.canDoubleJump = false;
+            cameraX = 0;
+            
+            for (let i = 0; i < 30; i++) { platforms.push({ x: i * TILE_SIZE, y: offscreenCanvas.height - TILE_SIZE, width: TILE_SIZE, height: TILE_SIZE, type: 'grass' }); }
+            platforms.push({ x: 5 * TILE_SIZE, y: offscreenCanvas.height - 4 * TILE_SIZE, width: 4 * TILE_SIZE, height: TILE_SIZE, type: 'grass' });
+            powerUpBlocks.push({x: 7 * TILE_SIZE, y: offscreenCanvas.height - 6 * TILE_SIZE, width: TILE_SIZE, height: TILE_SIZE, type: 'starblock', hit: false, visualHit: false, releasedItem: false, itemType: 'farofa'});
+            enemies.push({ x: 12 * TILE_SIZE, y: offscreenCanvas.height - TILE_SIZE - (TILE_SIZE * 0.9), width: TILE_SIZE * 0.9, height: TILE_SIZE * 0.9, type: 'goomba', dx: -1, originalX: 12 * TILE_SIZE, patrolRange: TILE_SIZE * 4 });
+            trampolines.push({x: 15 * TILE_SIZE, y: offscreenCanvas.height - TILE_SIZE * 2, width: TILE_SIZE, height: TILE_SIZE, type: 'trampoline'});
+            
+            gameWon = false;
+            bossFightState.dialogueSeen = false;
+            resetBoss();
+        }
+        
+        function updateHUD() {
+            scoreDisplay.textContent = score;
+            livesDisplay.textContent = lives;
+            ammoLabel.textContent = "Munição";
+            ammoDisplay.textContent = player.bleachAmmo;
+            bossHpDisplay.textContent = Math.max(0, ednaldoBoss.hp);
+        }
+
+        function generateMapIfNeeded() {
+            if (ednaldoBoss.isSpawned) return;
+            if (player.x > BOSS_ARENA_START_X - offscreenCanvas.width && !powerUpBlocks.find(b => b.itemType === 'boneGun')) {
+                powerUpBlocks.push({
+                    x: BOSS_ARENA_START_X - TILE_SIZE * 5, 
+                    y: offscreenCanvas.height - 6 * TILE_SIZE, 
+                    width: TILE_SIZE, height: TILE_SIZE, type: 'starblock', 
+                    hit: false, visualHit: false, releasedItem: false, itemType: 'boneGun'
+                });
+                platforms.push({ x: BOSS_ARENA_START_X - TILE_SIZE * 5, y: offscreenCanvas.height - 5 * TILE_SIZE, width: TILE_SIZE, height: TILE_SIZE, type: 'grass' });
+            }
+
+            if (player.x > BOSS_ARENA_START_X && !ednaldoBoss.isSpawned) {
+                ednaldoBoss.isSpawned = true;
+                enemies = enemies.filter(e => e.x < BOSS_ARENA_START_X);
+                powerUpBlocks = powerUpBlocks.filter(b => b.x < BOSS_ARENA_START_X);
+                powerUps = powerUps.filter(pu => pu.x < BOSS_ARENA_START_X);
+                trampolines = trampolines.filter(t => t.x < BOSS_ARENA_START_X);
+
+                for (let i = 0; i < BOSS_ARENA_WIDTH / TILE_SIZE; i++) { 
+                    platforms.push({ x: BOSS_ARENA_START_X + i * TILE_SIZE, y: offscreenCanvas.height - TILE_SIZE, width: TILE_SIZE, height: TILE_SIZE, type: 'grass' }); 
+                }
+                platforms.push({ x: BOSS_ARENA_START_X - TILE_SIZE, y: 0, width: TILE_SIZE, height: offscreenCanvas.height, type: 'grass' }); 
+                platforms.push({ x: BOSS_ARENA_END_X, y: 0, width: TILE_SIZE, height: offscreenCanvas.height, type: 'grass' });
+                
+                trampolines.push({ x: BOSS_ARENA_START_X + 5 * TILE_SIZE, y: offscreenCanvas.height - TILE_SIZE * 2, width: TILE_SIZE, height: TILE_SIZE, type: 'trampoline' });
+                trampolines.push({ x: BOSS_ARENA_END_X - 6 * TILE_SIZE, y: offscreenCanvas.height - TILE_SIZE * 2, width: TILE_SIZE, height: TILE_SIZE, type: 'trampoline' });
+
+                sounds.bgmMusic.pause(); sounds.bgmMusic.currentTime = 0;
+                return;
+            }
+
+            const lastPlatform = platforms[platforms.length - 1];
+            if (lastPlatform && player.x > lastPlatform.x - offscreenCanvas.width * 1.5) {
+                const startX = lastPlatform.x + lastPlatform.width;
+                const numNewPlatforms = 10 + Math.floor(Math.random() * 5);
+                for (let i = 0; i < numNewPlatforms; i++) { platforms.push({ x: startX + i * TILE_SIZE, y: offscreenCanvas.height - TILE_SIZE, width: TILE_SIZE, height: TILE_SIZE, type: 'grass' }); }
+                if (Math.random() < 0.1) { trampolines.push({ x: startX + (Math.floor(Math.random() * numNewPlatforms)) * TILE_SIZE, y: offscreenCanvas.height - TILE_SIZE * 2, width: TILE_SIZE, height: TILE_SIZE, type: 'trampoline' }); }
+                if (Math.random() < 0.3) { const platY = offscreenCanvas.height - (Math.floor(Math.random() * 3) + 3) * TILE_SIZE; const platWidth = (Math.floor(Math.random() * 3) + 2) * TILE_SIZE; platforms.push({ x: startX + (Math.floor(Math.random() * numNewPlatforms)) * TILE_SIZE, y: platY, width: platWidth, height: TILE_SIZE, type: 'grass' });}
+                if (Math.random() < 0.2) { const blockY = offscreenCanvas.height - (Math.floor(Math.random() * 2) + 6) * TILE_SIZE; powerUpBlocks.push({ x: startX + (Math.floor(Math.random() * numNewPlatforms)) * TILE_SIZE, y: blockY, width: TILE_SIZE, height: TILE_SIZE, type: 'starblock', hit: false, visualHit:false, releasedItem: false, itemType: 'farofa'});}
+                if (Math.random() < 0.1) { const blockY = offscreenCanvas.height - (Math.floor(Math.random() * 2) + 6) * TILE_SIZE; powerUpBlocks.push({ x: startX + (Math.floor(Math.random() * numNewPlatforms)) * TILE_SIZE, y: blockY, width: TILE_SIZE, height: TILE_SIZE, type: 'starblock', hit: false, visualHit:false, releasedItem: false, itemType: 'bleach'});}
+                if (Math.random() < 0.15) { enemies.push({ x: startX + (Math.floor(Math.random() * numNewPlatforms) +3) * TILE_SIZE, y: offscreenCanvas.height - TILE_SIZE  - (TILE_SIZE*0.9), width: TILE_SIZE*0.9, height: TILE_SIZE*0.9, type: 'goomba', dx: (Math.random() < 0.5 ? -1 : 1), originalX: startX + (Math.floor(Math.random() * numNewPlatforms)+3) * TILE_SIZE, patrolRange: TILE_SIZE * 4 });}
+            }
+        }
+
+        function updatePlayer() {
+            if (player.state === 'dead') {
+                player.dy += GRAVITY * 1.5; player.y += player.dy;
+                if (player.y > offscreenCanvas.height + player.height * 2) { handleDeath(); }
+                return;
+            }
+            if (ednaldoBoss.isSpawned && ednaldoBoss.state === 'idle' && !bossFightState.dialogue && !bossFightState.dialogueSeen &&
+                player.x < ednaldoBoss.x + ednaldoBoss.width && player.x + player.width > ednaldoBoss.x &&
+                player.y < ednaldoBoss.y + ednaldoBoss.height && player.y + player.height > ednaldoBoss.y) {
+                bossFightState.dialogue = true; player.dx = 0; runDialogue();
+            }
+            player.x += player.dx; player.dy += GRAVITY; player.y += player.dy; player.onGround = false;
+            [...platforms, ...powerUpBlocks].forEach(p => {
+                if (player.y + player.height >= p.y && player.y + player.height - player.dy <= p.y + 1 && player.x + player.width > p.x && player.x < p.x + p.width) {
+                    player.y = p.y - player.height; player.dy = 0; player.onGround = true; player.canDoubleJump = false;
+                    if (player.state === 'falling' || player.state === 'jumping') player.state = player.dx !== 0 ? 'walking' : 'idle';
+                }
+                if (player.y + player.height > p.y + 5 && player.y < p.y + p.height - 5) {
+                    if (player.dx > 0 && player.x + player.width >= p.x && player.x + player.width - player.dx < p.x) { player.x = p.x - player.width; player.dx = 0; }
+                    else if (player.dx < 0 && player.x <= p.x + p.width && player.x - player.dx > p.x + p.width) { player.x = p.x + p.width; player.dx = 0; }
+                }
+                if (p.type === 'starblock' && !p.hit && player.x < p.x + p.width && player.x + player.width > p.x && player.y <= p.y + p.height && player.y - player.dy > p.y + p.height && player.dy < 0) {
+                    player.y = p.y + p.height; player.dy = 0.1; p.hit = true; p.visualHit = true;
+                    if (!p.releasedItem) {
+                        let itemWidth = TILE_SIZE * 0.7, itemHeight = TILE_SIZE * 0.7;
+                        if (p.itemType === 'bleach') { itemWidth = TILE_SIZE/1.8; itemHeight = TILE_SIZE/1.8; }
+                        if (p.itemType === 'boneGun') { itemHeight = TILE_SIZE * 1.2; }
+                        powerUps.push({ x: p.x + (TILE_SIZE - itemWidth) / 2, y: p.y - itemHeight, width: itemWidth, height: itemHeight, type: p.itemType, dy: -4, onGround: false, gravityEffect: true });
+                        p.releasedItem = true;
+                    }
+                }
+            });
+            trampolines.forEach(t => { if (player.dy > 0 && player.x < t.x + t.width && player.x + player.width > t.x && player.y + player.height >= t.y && player.y + player.height - player.dy <= t.y + 10) { player.dy = -PLAYER_JUMP_FORCE * 1.8; player.onGround = false; sounds.trampolineJump.currentTime = 0; sounds.trampolineJump.play(); player.canDoubleJump = true; } });
+            if (player.y > offscreenCanvas.height + player.height && !ednaldoBoss.isSpawned) { if (lives > 0 && player.state !== 'dead') { sounds.playerDeathGeneric.currentTime = 0; sounds.playerDeathGeneric.play(); player.state = 'dead'; player.dy = -PLAYER_JUMP_FORCE / 2; player.dx = 0; } }
+            
+            if (!player.onGround && player.dy > GRAVITY && player.state !== 'dead') { player.state = 'falling'; }
+
+            player.animationTimer++;
+            if (player.animationTimer >= player.currentAnimationSpeed) {
+                player.animationTimer = 0; player.animationFrame++;
+                const animType = (player.state === 'jumping' || player.state === 'falling') ? 'jump' : 'walking';
+                const currentAnimData = player.spriteData[animType];
+                if (player.state === 'idle' || player.state === 'dead') player.animationFrame = 0;
+                else if (currentAnimData && player.animationFrame >= currentAnimData.sprites.length) {
+                    if (player.state === 'jumping' || player.state === 'falling') player.animationFrame = currentAnimData.sprites.length -1;
+                    else player.animationFrame = 0;
+                }
+            }
+            
+            let targetCameraX = player.x - offscreenCanvas.width / 3;
+            cameraX += (targetCameraX - cameraX) * 0.1;
+
+            if (ednaldoBoss.isSpawned) {
+                const minCamX = BOSS_ARENA_START_X;
+                const maxCamX = BOSS_ARENA_END_X - offscreenCanvas.width;
+                cameraX = Math.max(minCamX, Math.min(cameraX, maxCamX));
+            } else {
+                if (cameraX < 0) cameraX = 0;
+            }
+        }
+
+        function updateEnemies() {
+             enemies.forEach((enemy, enemyIndex) => {
+                if (enemy.type === 'goomba') {
+                    enemy.x += enemy.dx;
+                    if (enemy.x < enemy.originalX - enemy.patrolRange || enemy.x + enemy.width > enemy.originalX + enemy.patrolRange) enemy.dx *= -1;
+                }
+                if (player.state !== 'dead' && player.x < enemy.x + enemy.width && player.x + player.width > enemy.x && player.y < enemy.y + enemy.height && player.y + player.height > enemy.y) {
+                    if (player.dy > 0 && (player.y + player.height) < (enemy.y + enemy.height * 0.5)) {
+                        enemies.splice(enemyIndex, 1); player.dy = -PLAYER_JUMP_FORCE / 1.8; score += 100;
+                    } else if (player.state !== 'dead') {
+                        playerHitByBoss();
+                    }
+                }
+            });
+        }
+
+        function updateItems() {
+            powerUps.forEach((pu, index) => {
+                if (pu.gravityEffect && !pu.onGround) { pu.dy += GRAVITY / 1.5; pu.y += pu.dy; }
+                platforms.forEach(platform => { if (pu.x < platform.x + platform.width && pu.x + pu.width > platform.x && pu.y + pu.height >= platform.y && pu.y + pu.height - pu.dy <= platform.y + 1) { pu.y = platform.y - pu.height; pu.dy = 0; pu.onGround = true; } });
+                
+                if (player.x < pu.x + pu.width && player.x + player.width > pu.x && player.y < pu.y + pu.height && player.y + player.height > pu.y) {
+                    sounds.playerPowerup.currentTime = 0; sounds.playerPowerup.play();
+                    if (pu.type === 'farofa') {
+                        if (lives < 3) { lives++; }
+                    } else if (pu.type === 'bleach') {
+                        player.bleachAmmo += 5;
+                    } else if (pu.type === 'boneGun') {
+                        player.bleachAmmo += 12;
+                    }
+                    powerUps.splice(index, 1);
+                }
+            });
+
+            bleachProjectiles.forEach((proj, index) => {
+                proj.x += proj.dx;
+                proj.life--;
+                if (proj.life <= 0) { bleachProjectiles.splice(index, 1); return; }
+                if (bossFightState.active && ednaldoBoss.state === 'vulnerable' && 
+                    proj.x < ednaldoBoss.x + ednaldoBoss.width && proj.x + proj.width > ednaldoBoss.x && 
+                    proj.y < ednaldoBoss.y + ednaldoBoss.height && proj.y + proj.height > ednaldoBoss.y) {
+                    
+                    ednaldoBoss.hp -= 5;
+                    ednaldoBoss.vibration = 10;
+                    bleachProjectiles.splice(index, 1);
+                }
+            });
+        }
+
+        function runDialogue() {
+            player.dx = 0;
+            if (bossFightState.step === 0) { sounds.bossDialogue1.play(); bossFightState.step = 1; setTimeout(runDialogue, 2000); }
+            else if (bossFightState.step === 1) { bossFightState.step = 2; setTimeout(runDialogue, 1500); }
+            else if (bossFightState.step === 2) { sounds.bossDialogue2.play(); bossFightState.step = 3; setTimeout(runDialogue, 2500); }
+            else if (bossFightState.step === 3) {
+                bossFightState.dialogue = false;
+                bossFightState.active = true;
+                bossFightState.dialogueSeen = true;
+                ednaldoBoss.state = 'attacking';
+                bossHud.style.display = 'inline-block';
+                sounds.bossMusic.currentTime = 0;
+                sounds.bossMusic.play();
+            }
+        }
+
+        function updateBoss() {
+            if (!bossFightState.active || ednaldoBoss.state === 'defeated') return;
+            if (ednaldoBoss.vibration > 0) ednaldoBoss.vibration--;
+
+            if (ednaldoBoss.state === 'vulnerable') {
+                ednaldoBoss.y = ednaldoBoss.originalY + 60;
+                ednaldoBoss.vulnerableTimer--;
+                ednaldoBoss.vibration = Math.sin(Date.now() * 0.5) * 4;
+                
+                if (player.dy > 0 && 
+                    player.x + player.width > ednaldoBoss.x && player.x < ednaldoBoss.x + ednaldoBoss.width &&
+                    player.y + player.height >= ednaldoBoss.y && player.y + player.height - player.dy < ednaldoBoss.y + 20) {
+                    
+                    ednaldoBoss.hp -= 25;
+                    player.dy = -PLAYER_JUMP_FORCE * 0.8;
+                    player.canDoubleJump = true;
+                    ednaldoBoss.state = 'attacking';
+                    ednaldoBoss.attackTimer = 120;
+                    ednaldoBoss.y = ednaldoBoss.originalY;
+                }
+
+                if (ednaldoBoss.vulnerableTimer <= 0) {
+                    ednaldoBoss.state = 'attacking';
+                    ednaldoBoss.attackTimer = 120;
+                    ednaldoBoss.y = ednaldoBoss.originalY;
+                }
+            }
+
+            if (ednaldoBoss.state === 'attacking') {
+                ednaldoBoss.attackTimer--;
+                if (ednaldoBoss.attackTimer <= 0) {
+                    const attackType = Math.random();
+                    if (attackType < 0.6) {
+                        const ballSpeed = 6;
+                        const angle = Math.atan2((player.y + player.height/2) - (ednaldoBoss.y + 100), (player.x + player.width/2) - (ednaldoBoss.x + ednaldoBoss.width/2));
+                        baniduBalls.push({
+                            x: ednaldoBoss.x + ednaldoBoss.width/2, y: ednaldoBoss.y + 100,
+                            width: 60, height: 60,
+                            dx: Math.cos(angle) * ballSpeed, dy: Math.sin(angle) * ballSpeed,
+                            rotation: 0
+                        });
+                    } else {
+                        groundSpikes.push({
+                            x: player.x, y: offscreenCanvas.height - TILE_SIZE - TILE_SIZE,
+                            width: TILE_SIZE * 2, height: TILE_SIZE,
+                            state: 'warning', timer: 60
+                        });
+                    }
+                    
+                    ednaldoBoss.attackCount++;
+                    if (ednaldoBoss.attackCount >= 4) {
+                        ednaldoBoss.state = 'vulnerable';
+                        ednaldoBoss.vulnerableTimer = 240;
+                        ednaldoBoss.attackCount = 0;
+                    } else {
+                        ednaldoBoss.attackTimer = 120 + Math.random() * 60;
+                    }
+                }
+
+                ednaldoBoss.tauntTimer--;
+                if (ednaldoBoss.tauntTimer <= 0) {
+                    const randomTaunt = bossTaunts[Math.floor(Math.random() * bossTaunts.length)];
+                    randomTaunt.currentTime = 0; randomTaunt.play();
+                    ednaldoBoss.tauntTimer = 240 + Math.random() * 120;
+                }
+            }
+
+            if(ednaldoBoss.hp <= 0 && ednaldoBoss.state !== 'defeated') {
+                ednaldoBoss.state = 'defeated'; 
+                sounds.bossMusic.pause(); sounds.bossMusic.currentTime = 0;
+                sounds.bossDefeat.currentTime = 0; sounds.bossDefeat.play();
+                sounds.victoryMusic.play();
+                bossFightState.active = false; score += 10000; gameWon = true;
+            }
+
+            baniduBalls.forEach((ball, i) => {
+                ball.x += ball.dx; ball.y += ball.dy; ball.rotation += 0.1;
+                if (ball.y > offscreenCanvas.height + ball.height || ball.x < cameraX - ball.width || ball.x > cameraX + offscreenCanvas.width) baniduBalls.splice(i, 1);
+                if (!gameWon && player.state !== 'dead' && player.x < ball.x + ball.width && player.x + player.width > ball.x && player.y < ball.y + ball.height && player.y + player.height > ball.y) { playerHitByBoss(); baniduBalls.splice(i, 1); }
+            });
+
+            groundSpikes.forEach((spike, i) => {
+                spike.timer--;
+                if (spike.state === 'warning' && spike.timer <= 0) {
+                    spike.state = 'active';
+                    spike.timer = 90;
+                }
+                if (spike.state === 'active') {
+                    if (!gameWon && player.state !== 'dead' && player.x < spike.x + spike.width && player.x + player.width > spike.x && player.y + player.height > spike.y) {
+                         playerHitByBoss();
+                    }
+                    if (spike.timer <= 0) {
+                        groundSpikes.splice(i, 1);
+                    }
+                }
+            });
+        }
+
+        function playerHitByBoss() {
+            if (player.state === 'dead') return;
+            sounds.playerDeathGeneric.currentTime = 0;
+            sounds.playerDeathGeneric.play();
+            player.state = 'dead';
+            player.dy = -PLAYER_JUMP_FORCE / 2;
+            player.dx = (player.x < ednaldoBoss.x + ednaldoBoss.width / 2 ? -1 : 1) * PLAYER_MOVE_SPEED / 2;
+            if (lives > 1) { sounds.bossPlayerKill.currentTime = 0; sounds.bossPlayerKill.play(); }
+        }
+
+        function handleDeath() {
+            let inBossFight = ednaldoBoss.isSpawned;
+            lives--;
+            if (lives <= 0) {
+                isGameRunning = false;
+                Object.values(sounds).forEach(sound => { sound.pause(); sound.currentTime = 0; });
+                bossHud.style.display = 'none';
+                resetButton.classList.remove('hidden');
+                setTimeout(() => {
+                    alert(`FIM DE JOGO! Pontuação: ${score}`);
+                    resetGame(); // Go back to main menu
+                }, 200);
+            } else {
+                player.x = inBossFight ? BOSS_ARENA_START_X + 100 : 100 + cameraX;
+                player.y = offscreenCanvas.height - TILE_SIZE * 5;
+                
+                if (inBossFight) {
+                    resetBoss();
+                    ednaldoBoss.isSpawned = true;
+                    if (bossFightState.dialogueSeen) {
+                        bossFightState.active = true;
+                        ednaldoBoss.state = 'attacking';
+                        ednaldoBoss.attackTimer = 60;
+                        bossHud.style.display = 'inline-block';
+                        sounds.bossMusic.currentTime = 0; sounds.bossMusic.play();
+                    } else {
+                        ednaldoBoss.state = 'idle';
+                        bossFightState.active = false;
+                        bossHud.style.display = 'none';
+                    }
+                    bossFightState.dialogue = false;
+                    bossFightState.step = 0;
+                } else {
+                    if (!sounds.bgmMusic.paused) { sounds.bgmMusic.currentTime = 0; sounds.bgmMusic.play(); }
+                }
+                player.dy = 0; player.dx = 0; player.onGround = false; player.state = 'idle';
+            }
+        }
+        
+        // ... [END OF COPIED BLOCK] ...
+        
+        function startGame() {
+            if (assetsLoaded < totalAssets || !player.spriteData.walking || !player.spriteData.jump) { 
+                alert("Assets ainda carregando, por favor aguarde..."); 
+                return; 
+            }
+            showScreen('game');
+            isGameRunning = true; 
+            generateInitialMap(); 
+            updateHUD();
+            bossHud.style.display = 'none';
+            gameLoop();
+        }
+
+        function resetGame() {
+            isGameRunning = false;
+            Object.values(sounds).forEach(sound => { sound.pause(); sound.currentTime = 0; });
+            showScreen('menu');
+            score = 0; 
+            lives = 3; 
+            player.state = 'idle'; 
+            updateHUD();
+            offscreenCtx.clearRect(0, 0, offscreenCanvas.width, offscreenCanvas.height);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            resetButton.classList.add('hidden');
+        }
+
+        // --- DRAW FUNCTIONS (Modified to draw on offscreen canvas) ---
+        function drawParallax() {
+            offscreenCtx.clearRect(0, 0, offscreenCanvas.width, offscreenCanvas.height);
+            if (images.parallaxBg.complete) {
+                offscreenCtx.drawImage(images.parallaxBg, 0, 0, offscreenCanvas.width, offscreenCanvas.height);
+            }
+            if (images.parallaxFg1.complete) {
+                const speed = 0.1;
+                const xPos = -(cameraX * speed % images.parallaxFg1.width);
+                offscreenCtx.drawImage(images.parallaxFg1, xPos, 0, images.parallaxFg1.width, offscreenCanvas.height);
+                offscreenCtx.drawImage(images.parallaxFg1, xPos + images.parallaxFg1.width, 0, images.parallaxFg1.width, offscreenCanvas.height);
+            }
+            if (images.parallaxFg2.complete) {
+                const speed = 0.3;
+                const xPos = -(cameraX * speed % images.parallaxFg2.width);
+                offscreenCtx.drawImage(images.parallaxFg2, xPos, offscreenCanvas.height - images.parallaxFg2.height, images.parallaxFg2.width, images.parallaxFg2.height);
+                offscreenCtx.drawImage(images.parallaxFg2, xPos + images.parallaxFg2.width, offscreenCanvas.height - images.parallaxFg2.height, images.parallaxFg2.width, images.parallaxFg2.height);
+            }
+        }
+
+        function drawMap() {
+            platforms.forEach(p => { if (images.grass.complete) offscreenCtx.drawImage(images.grass, p.x - cameraX, p.y, p.width, p.height);});
+            powerUpBlocks.forEach(b => { const img = (b.visualHit && images.starblock_hit.complete) ? images.starblock_hit : images.starblock; if (img.complete) offscreenCtx.drawImage(img, b.x - cameraX, b.y, b.width, b.height); });
+            powerUps.forEach(pu => {
+                let img;
+                if (pu.type === 'farofa') img = images.farofa;
+                if (pu.type === 'bleach') img = images.bleach;
+                if (pu.type === 'boneGun') img = images.boneGun;
+                if (img && img.complete) offscreenCtx.drawImage(img, pu.x - cameraX, pu.y, pu.width, pu.height);
+            });
+            trampolines.forEach(t => { if (images.trampoline.complete) offscreenCtx.drawImage(images.trampoline, t.x - cameraX, t.y, t.width, t.height);});
+            bleachProjectiles.forEach(proj => { 
+                offscreenCtx.fillStyle = 'white'; 
+                offscreenCtx.fillRect(proj.x - cameraX, proj.y, proj.width, proj.height); 
+            });
+            enemies.forEach(e => { if (images.goomba.complete) offscreenCtx.drawImage(images.goomba, e.x - cameraX, e.y, e.width, e.height);});
+        }
+        
+        function drawPlayer() {
+            offscreenCtx.save();
+            const drawX = player.x - cameraX;
+            if (player.direction === 'left') { offscreenCtx.scale(-1, 1); offscreenCtx.translate(-(drawX + player.width), 0); }
+            else { offscreenCtx.translate(drawX, 0); }
+            let sheet = images.idle, sx=0, sy=0, sw=0, sh=0;
+            if (player.state === 'dead') { sheet = images.death; }
+            else if (player.state !== 'idle') {
+                const animType = (player.state === 'jumping' || player.state === 'falling') ? 'jump' : 'walking';
+                if (player.spriteData[animType]) {
+                    sheet = images[animType];
+                    const frameIndex = Math.min(player.animationFrame, player.spriteData[animType].sprites.length - 1);
+                    const frameInfo = player.spriteData[animType].sprites[frameIndex];
+                    if (frameInfo) { sx=frameInfo.x; sy=frameInfo.y; sw=frameInfo.width; sh=frameInfo.height; }
+                }
+            }
+            if (sheet && sheet.complete) {
+                if(sw === 0 || sh === 0) { sw = sheet.naturalWidth; sh = sheet.naturalHeight; }
+                offscreenCtx.drawImage(sheet, sx, sy, sw, sh, 0, player.y, player.width, player.height);
+            }
+            offscreenCtx.restore();
+        }
+
+        function drawBoss() {
+            if (!ednaldoBoss.isSpawned || ednaldoBoss.state === 'defeated') return;
+            const vibX = (Math.random() - 0.5) * ednaldoBoss.vibration;
+            const vibY = (Math.random() - 0.5) * ednaldoBoss.vibration;
+            if(images.ednaldo.complete) { 
+                if (ednaldoBoss.state === 'vulnerable') {
+                    offscreenCtx.globalAlpha = 0.5 + Math.sin(Date.now() * 0.02) * 0.2;
+                }
+                offscreenCtx.drawImage(images.ednaldo, ednaldoBoss.x - cameraX + vibX, ednaldoBoss.y + vibY, ednaldoBoss.width, ednaldoBoss.height); 
+                offscreenCtx.globalAlpha = 1.0;
+            }
+            
+            baniduBalls.forEach(ball => {
+                offscreenCtx.save();
+                offscreenCtx.translate(ball.x - cameraX + ball.width/2, ball.y + ball.height/2);
+                offscreenCtx.rotate(ball.rotation);
+                if (images.banidu.complete) offscreenCtx.drawImage(images.banidu, -ball.width/2, -ball.height/2, ball.width, ball.height);
+                offscreenCtx.restore();
+            });
+
+            groundSpikes.forEach(spike => {
+                if (spike.state === 'warning') {
+                    offscreenCtx.fillStyle = `rgba(255, 0, 0, ${0.2 + Math.sin(spike.timer * 0.2) * 0.2})`;
+                    offscreenCtx.fillRect(spike.x - cameraX, spike.y + TILE_SIZE, spike.width, spike.height);
+                } else if (spike.state === 'active') {
+                    if (images.spike.complete) offscreenCtx.drawImage(images.spike, spike.x - cameraX, spike.y, spike.width, spike.height);
+                }
+            });
+        }
+
+        function drawDialogue() {
+            if (!bossFightState.dialogue) return;
+            offscreenCtx.fillStyle = 'rgba(0, 0, 0, 0.7)'; offscreenCtx.fillRect(50, offscreenCanvas.height - 120, offscreenCanvas.width - 100, 100);
+            offscreenCtx.fillStyle = 'white'; offscreenCtx.font = "18px 'Press Start 2P'"; offscreenCtx.textAlign = 'center';
+            let text = "";
+            if (bossFightState.step === 1) text = "Ednaldo: EDNALDO PEREIRA!"; 
+            else if (bossFightState.step === 2) text = "Nego: ya ya";
+            else if (bossFightState.step === 3) text = "Ednaldo: Voce nao vale nada!";
+            offscreenCtx.fillText(text, offscreenCanvas.width / 2, offscreenCanvas.height - 120 + 60);
+        }
+
+        function drawWinScreen() {
+            offscreenCtx.fillStyle = 'rgba(0, 0, 0, 0.9)'; offscreenCtx.fillRect(0, 0, offscreenCanvas.width, offscreenCanvas.height);
+            offscreenCtx.fillStyle = '#f1c40f'; offscreenCtx.font = "40px 'Press Start 2P'"; offscreenCtx.textAlign = 'center';
+            offscreenCtx.fillText("VOCE VENCEU!", offscreenCanvas.width / 2, offscreenCanvas.height / 2 - 100);
+            offscreenCtx.fillStyle = 'white'; offscreenCtx.font = "20px 'Press Start 2P'";
+            offscreenCtx.fillText(`Pontuacao Final: ${score}`, offscreenCanvas.width / 2, offscreenCanvas.height / 2);
+            resetButton.classList.remove('hidden');
+        }
+
+        function gameLoop() {
+            if (!isGameRunning) {
+                if (currentScreen === 'menu' || currentScreen === 'settings') {
+                    // Keep the loop running for potential menu animations, but do nothing.
+                } else {
+                    return; // Stop loop if not in game or menu
+                }
+            } else { // Game is running
+                if (gameWon) {
+                    drawWinScreen();
+                } else {
+                    handleInput();
+                    if(!bossFightState.dialogue) { 
+                        updatePlayer(); 
+                        updateEnemies(); 
+                        updateItems(); 
+                        updateBoss(); 
+                    }
+                    generateMapIfNeeded();
+                    
+                    drawParallax();
+                    drawMap(); 
+                    drawBoss(); 
+                    drawPlayer(); 
+                    drawDialogue();
+                    updateHUD();
+                }
+            }
+
+            // Render the offscreen canvas to the main visible canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(offscreenCanvas, 0, 0, canvas.width, canvas.height);
+            
+            requestAnimationFrame(gameLoop);
+        }
+
+        // --- EVENT LISTENERS ---
+        // Intro & Menu
+        initialPrompt.addEventListener('click', () => {
+            // This first user interaction unlocks audio playback for the whole page
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            showScreen('fmv');
+        }, { once: true });
+
+        fmvVideo.addEventListener('ended', () => {
+            showScreen('intro');
+        });
+
+        introMenuVideo.addEventListener('ended', () => {
+            showScreen('menu');
+        });
+        
+        playBtn.addEventListener('click', startGame);
+        resetButton.addEventListener('click', resetGame);
+        settingsBtn.addEventListener('click', () => showScreen('settings'));
+        settingsBackBtn.addEventListener('click', () => showScreen('menu'));
+        graphicsHqBtn.addEventListener('click', () => setGraphicsQuality('hq'));
+        graphicsSdBtn.addEventListener('click', () => setGraphicsQuality('sd'));
+
+        // Fullscreen Controls
+        const fullscreenStretchBtn = document.getElementById('fullscreen-stretch-btn');
+        const fullscreenAspectBtn = document.getElementById('fullscreen-aspect-btn');
+        const fullscreenExitBtn = document.getElementById('fullscreen-exit-btn');
+
+        function enterFullscreen(mode) {
+            document.body.classList.add('fullscreen-mode');
+            if (mode === 'stretch') document.body.classList.add('fullscreen-stretch');
+            else document.body.classList.add('fullscreen-aspect');
+            gameWrapper.requestFullscreen().catch(err => {
+                alert(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+            });
+        }
+
+        function exitFullscreen() { if (document.exitFullscreen) document.exitFullscreen(); }
+
+        function onFullscreenChange() {
+            if (!document.fullscreenElement) {
+                document.body.classList.remove('fullscreen-mode', 'fullscreen-stretch', 'fullscreen-aspect');
+                fullscreenStretchBtn.style.display = 'inline-block';
+                fullscreenAspectBtn.style.display = 'inline-block';
+                fullscreenExitBtn.classList.add('hidden');
+            } else {
+                fullscreenStretchBtn.style.display = 'none';
+                fullscreenAspectBtn.style.display = 'none';
+                fullscreenExitBtn.classList.remove('hidden');
+            }
+        }
+        
+        fullscreenStretchBtn.addEventListener('click', () => enterFullscreen('stretch'));
+        fullscreenAspectBtn.addEventListener('click', () => enterFullscreen('aspect'));
+        fullscreenExitBtn.addEventListener('click', exitFullscreen);
+        document.addEventListener('fullscreenchange', onFullscreenChange);
+
+        // Mobile Controls
+        function setupMobileControls() {
+            const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+            if (!isMobile) return;
+
+            document.getElementById('mobile-controls').style.display = 'block';
+            const mobileLeft = document.getElementById('mobile-left');
+            const mobileRight = document.getElementById('mobile-right');
+            const mobileJump = document.getElementById('mobile-jump');
+            const mobileAttack = document.getElementById('mobile-attack');
+
+            const setKey = (key, value) => { keys[key] = value; };
+
+            mobileLeft.addEventListener('touchstart', (e) => { e.preventDefault(); setKey('a', true); }, { passive: false });
+            mobileLeft.addEventListener('touchend', (e) => { e.preventDefault(); setKey('a', false); }, { passive: false });
+            mobileRight.addEventListener('touchstart', (e) => { e.preventDefault(); setKey('d', true); }, { passive: false });
+            mobileRight.addEventListener('touchend', (e) => { e.preventDefault(); setKey('d', false); }, { passive: false });
+            mobileJump.addEventListener('touchstart', (e) => { 
+                e.preventDefault(); 
+                if (player.state === 'dead') return;
+                if (player.onGround) {
+                    player.dy = -PLAYER_JUMP_FORCE; player.onGround = false; player.state = 'jumping';
+                    player.animationFrame = 0; sounds.playerJump.play(); player.canDoubleJump = true;
+                } else if (player.canDoubleJump) {
+                    player.dy = -PLAYER_JUMP_FORCE * 0.9; player.state = 'jumping';
+                    player.animationFrame = 0; sounds.playerJump.play(); player.canDoubleJump = false;
+                }
+            }, { passive: false });
+            mobileAttack.addEventListener('touchstart', (e) => { e.preventDefault(); playerAttack(); }, { passive: false });
+        }
+
+        // --- INITIALIZATION ---
+        window.onload = () => {
+            loadSpriteData();
+            setupMobileControls();
+            showScreen('prompt'); // Start with the initial prompt
+            gameLoop(); // Start the main loop
+        };
+    </script>
+</body>
+</html>

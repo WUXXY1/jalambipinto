@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Casa Caiu - Jalambi Pinto Movies</title>
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="images/favicon.ico">
+    <link rel="icon" sizes="64x64" href="images/favicon.ico">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/movie-detail.css">
+    <link rel="stylesheet" href="css/animations.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo-container">
+                <img src="images/JLMB logo.png" alt="Jalambi pinto Logo">
+                <h1>Jalambi Pinto Movies</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html" class="nav-item">Home</a></li>
+                    <li><a href="index.html#filmes" class="nav-item">Filmes</a></li>
+                    <li><a href="index.html#proximos" class="nav-item">Próximos</a></li>
+                    <li><a href="index.html#sobre" class="nav-item">Sobre</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="movie-detail">
+        <div class="container">
+            <div class="movie-detail-content">
+                <div class="movie-poster">
+                    <img src="images/CSREV1.png" alt="A Casa Caiu">
+                </div>
+                <div class="movie-info-detail">
+                    <h2>A Casa Caiu</h2>
+                    <div class="movie-meta">
+                        <span class="movie-year">2025</span>
+                        <span class="movie-duration">130 min</span>
+                        <span class="movie-rating">17+</span>
+                    </div>
+                    <div class="movie-production">
+                        <p><strong>Produção:</strong> Jalambi pinto</p>
+                        <p><strong>Dos criadores de:</strong> Peidei na Farofa e Caguei no Açougue</p>
+                    </div>
+                    <div class="movie-synopsis">
+                        <h3>Sinopse</h3>
+                        <p>O terceiro filme da aclamada trilogia traz nossos protagonistas enfrentando seu maior desafio até agora. Após os eventos de "Caguei no Açougue", o grupo de amigos decide fazer uma festa em uma mansão alugada, mas as coisas saem completamente do controle quando uma série de acidentes catastróficos começam a destruir a propriedade.</p>
+                        <p>Com efeitos especiais de explosões, perseguições alucinantes e a participação de personagens de todos os filmes anteriores, "A Casa Caiu" é o épico culminante que une todas as histórias em um final explosivo e hilariante.</p>
+                        <p>Repleto de referências aos filmes anteriores e com participações especiais, este filme encerra a saga com chave de ouro, trazendo o humor característico da franquia para um novo patamar de absurdo.</p>
+                    </div>
+                    <div class="movie-cast">
+                        <h3>Elenco</h3>
+                        <ul>
+                            <li>Nego Man (Protagonista)</li>
+                            <li>Zé Droguinha (Coadjuvante)</li>
+                            <li>Personagens de filmes anteriores</li>
+                            <li>Participações especiais</li>
+                        </ul>
+                    </div>
+                    <div class="movie-trailer">
+                        <h3>Trailer</h3>
+                        <div class="trailer-placeholder">
+                            <p>Trailer em breve!</p>
+                        </div>
+                    </div>
+                    <div class="movie-gallery">
+                        <h3>Galeria</h3>
+                        <div class="gallery-images">
+                            <div class="gallery-image-placeholder">
+                                <p>Imagens em breve!</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="back-button">
+                        <a href="index.html#filmes" class="btn">Voltar para Filmes</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="related-movies">
+        <div class="container">
+            <h2>Filmes Relacionados</h2>
+            <div class="related-movies-grid">
+                <div class="movie-card">
+                    <img src="images/peideinafarofaHD.png" alt="Peidei na Farofa">
+                    <div class="movie-info">
+                        <h3>Peidei na Farofa</h3>
+                        <p>O primeiro filme da trilogia</p>
+                        <a href="peidei-na-farofa.html" class="btn">Ver Detalhes</a>
+                    </div>
+                </div>
+
+                <div class="movie-card">
+                    <img src="images/cagueinoacogueHD.png" alt="Caguei no Açougue">
+                    <div class="movie-info">
+                        <h3>Caguei no Açougue</h3>
+                        <p>O segundo filme da trilogia</p>
+                        <a href="caguei-no-acougue.html" class="btn">Ver Detalhes</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>© 2025 Jalambi pinto Movies. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- Botão de Mute (inicialmente escondido pelo CSS) -->
+    <button id="mute-button" class="mute-button">Mute BGM</button>
+
+    <!-- Sons (agora com links Catbox) -->
+    <audio id="bgm-sound" src="https://files.catbox.moe/s5v55s.mp3" autoplay loop preload="auto"></audio>
+    <audio id="hover-sound" src="https://files.catbox.moe/7ggm5j.mp3" preload="auto"></audio>
+    <audio id="about-sound" src="https://files.catbox.moe/6f07t8.mp3" preload="auto"></audio>
+
+    <script src="js/script.js"></script>
+    <script src="js/animations.js"></script>
+</body>
+</html>

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vale Almoço - Jalambi Pinto Movies</title>
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="images/favicon.ico">
+    <link rel="icon" sizes="64x64" href="images/favicon.ico">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/movie-detail.css">
+    <link rel="stylesheet" href="css/animations.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo-container">
+                <img src="images/JLMB logo.png" alt="Jalambi pinto Logo">
+                <h1 class="site-title">Jalambi Pinto Movies</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html" class="nav-item">Home</a></li>
+                    <li><a href="index.html#filmes" class="nav-item">Filmes</a></li>
+                    <li><a href="index.html#proximos" class="nav-item">Próximos</a></li>
+                    <li><a href="index.html#sobre" class="nav-item">Sobre</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="movie-detail">
+        <div class="container">
+            <div class="movie-detail-content">
+                <div class="movie-poster">
+                    <img src="images/vale_almoco.png" alt="Vale Almoço">
+                </div>
+                <div class="movie-info-detail">
+                    <h2>Vale Almoço</h2>
+                    <div class="movie-meta">
+                        <span class="movie-year">2025</span>
+                        <span class="movie-duration">1 hora</span>
+                        <span class="movie-rating">17+</span>
+                    </div>
+                    <div class="movie-production">
+                        <p><strong>Produção:</strong> Uma Descoberta Macabra da Jalambi Pinto</p>
+                    </div>
+                    <div class="movie-synopsis">
+                        <h3>Sinopse do Horror Alimentar</h3>
+                        <p>Em uma de suas errantes viagens interdimensionais, Nego Man aterrissa em uma paisagem desoladora e bizarra. No chão empoeirado, um brilho incomum chama sua atenção: um 'VALE ALMOÇO'.</p>
+                        <p>Mas este não é um cartão comum. Ao tocá-lo, uma antiga maldição é despertada, e das entranhas distorcidas dessa realidade emerge Steve, uma criatura grotesca e implacável com um apetite insaciável.</p>
+                        <p>Agora, Nego Man precisa usar toda a sua astúcia (e talvez seus sapatos) para escapar da perseguição faminta desta aberração pixelada, onde o prêmio não é uma refeição, mas a própria sanidade.</p>
+                    </div>
+                    <div class="movie-cast">
+                        <h3>Elenco do Desespero</h3>
+                        <ul>
+                            <li>Nego Man (O Azarado)</li>
+                            <li>Steve Grotesco (O Caçador)</li>
+                            <li>Vale Almoço Amaldiçoado (O Gatilho)</li>
+                            <li>Expectadores (Potenciais Vítimas)</li>
+                        </ul>
+                    </div>
+                    <div class="movie-trailer">
+                        <h3>Trailer (Se Sobreviver)</h3>
+                        <!-- A DIV trailer-placeholder foi removida daqui -->
+                        <video controls style="width: 100%; max-width: 600px; display: block; margin: 0 auto;">
+                            <source src="https://files.catbox.moe/2czern.mp4" type="video/mp4">
+                            Seu navegador não suporta o elemento de vídeo.
+                        </video>
+                    </div>
+                    <div class="movie-gallery">
+                        <h3>Galeria da Angústia</h3>
+                        <div class="gallery-images">
+                            <div class="gallery-image-placeholder">
+                                <p>Imagens que você preferia não ter visto.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="back-button">
+                        <a href="index.html#filmes" class="btn">Voltar (Por Sua Conta e Risco)</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="related-movies">
+        <div class="container">
+            <h2>Outras Abominações Cinematográficas</h2>
+            <div class="related-movies-grid">
+                <div class="movie-card">
+                    <img src="images/negoman_filme.png" alt="Nego Man - O Filme">
+                    <div class="movie-info">
+                        <h3>Nego Man - O Filme</h3>
+                        <p>As origens do caos.</p>
+                        <a href="nego-man.html" class="btn">Ver Detalhes</a>
+                    </div>
+                </div>
+                <div class="movie-card">
+                    <img src="images/meu_amigo_pedro_o_homeless.png" alt="Meu amigo PEDRO o homeless">
+                    <div class="movie-info">
+                        <h3>Meu amigo PEDRO o homeless</h3>
+                        <p>Outro nível de perturbação.</p>
+                        <a href="meu-amigo-pedro.html" class="btn">Ver Detalhes</a>
+                    </div>
+                </div>
+                 <div class="movie-card">
+                    <img src="images/CSREV1.png" alt="A Casa Caiu">
+                    <div class="movie-info">
+                        <h3>A Casa Caiu</h3>
+                        <p>Quando tudo desmorona.</p>
+                        <a href="a-casa-caiu.html" class="btn">Ver Detalhes</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>© Data Indefinida - Jalambi Pinto Movies. Fuja enquanto pode.</p>
+        </div>
+    </footer>
+
+    <button id="mute-button" class="mute-button">Mute BGM</button>
+    <audio id="bgm-sound" src="https://files.catbox.moe/m3esuh" autoplay loop preload="auto"></audio>
+    <audio id="hover-sound" src="https://files.catbox.moe/7ggm5j.mp3" preload="auto"></audio>
+    <audio id="about-sound" src="https://files.catbox.moe/6f07t8.mp3" preload="auto"></audio>
+    <script src="js/script.js"></script>
+    <script src="js/animations.js"></script>
+</body>
+</html>

@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Falling Pijas - Jalambi Pinto Games</title>
+    <link rel="shortcut icon" href="images/favicon.ico">
+    <link rel="icon" sizes="64x64" href="images/favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { margin: 0; padding: 0; background-color: #1a1a1a; color: #fff; font-family: 'Poppins', sans-serif; display: flex; flex-direction: column; align-items: center; min-height: 100vh; overflow-x: hidden; }
+        .game-header { text-align: center; margin-top: 20px; margin-bottom: 10px; }
+        .game-header h1 { font-family: 'Press+Start+2P', cursive; font-size: 2.5em; color: #ff6b00; text-shadow: 2px 2px #000; margin-bottom: 5px; }
+        .game-header p { font-family: 'Poppins', sans-serif; font-size: 1em; color: #ccc; }
+        .game-container { display: flex; flex-direction: column; align-items: center; gap: 15px; width: 100%; max-width: 900px; padding: 10px; }
+        .how-to-play-container { width: 100%; max-width: 400px; margin-bottom: 10px; border: 3px solid #ff6b00; border-radius: 8px; box-shadow: 0 0 15px rgba(255, 107, 0, 0.5); }
+        .how-to-play-container img { display: block; width: 100%; border-radius: 5px; }
+        .game-area { position: relative; width: 768px; height: 1080px; background-image: url('images/background.png'); background-size: cover; background-repeat: no-repeat; background-position: center; border: 5px solid #555; box-shadow: 0 0 20px rgba(0,0,0,0.7); overflow: hidden; }
+        #gameCanvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        .player-sprite { position: absolute; bottom: 10px; left: 0%; transform: translateX(0%); width: 250px; height: auto; z-index: 100; }
+        #playerCollisionDebug { position: absolute; background-image: url('images/col.png'); background-size: 100% 100%; opacity: 0; z-index: 1; pointer-events: none; }
+        .game-info { display: flex; justify-content: space-around; width: 100%; max-width: 768px; font-family: 'Press Start 2P', cursive; font-size: 1.2em; color: #fff; margin-top: 10px; padding: 10px; background-color: rgba(0,0,0,0.5); border-radius: 8px; }
+        .game-info span { color: #ffc107; }
+        .difficulty-selection, .game-controls { text-align: center; margin-top: 15px; }
+        .difficulty-selection h3 { font-family: 'Press Start 2P', cursive; color: #ff6b00; margin-bottom: 10px; font-size: 1.2em; }
+        .difficulty-button, .game-controls button, .back-to-site-btn { font-family: 'Press Start 2P', cursive; background-color: #ff6b00; color: white; border: none; padding: 10px 15px; font-size: 0.9em; cursor: pointer; border-radius: 5px; text-shadow: 1px 1px #000; transition: background-color 0.2s; margin: 5px; }
+        .difficulty-button:hover, .game-controls button:hover, .back-to-site-btn:hover { background-color: #e65c00; }
+        .difficulty-button.selected { background-color: #e65c00; box-shadow: 0 0 10px #ffc107; }
+        .game-controls button { padding: 12px 20px; font-size: 1em;}
+        .back-to-site-btn { display: inline-block; margin-top: 30px; margin-bottom: 30px; background-color: #777; }
+        .back-to-site-btn:hover { background-color: #555; }
+        #eretoOverlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(255, 0, 0, 0.2); z-index: 5; display: none; pointer-events: none; }
+        @media (max-width: 800px) { .game-area { width: 95vw; height: calc(95vw * (1080 / 768)); max-height: 80vh; } .game-header h1 { font-size: 2em; } .game-info { font-size: 1em; } .player-sprite { width: 200px; } #playerCollisionDebug {} .how-to-play-container { max-width: 90%;} .difficulty-selection h3 {font-size: 1em;} .difficulty-button {padding: 8px 12px; font-size:0.8em;} }
+        @media (max-width: 480px) { .game-header h1 { font-size: 1.5em; } .game-info { flex-direction: column; align-items: center; gap: 10px; font-size: 0.9em;} .player-sprite { width: 150px; } #playerCollisionDebug {} .game-controls button { font-size: 0.9em; padding: 10px 15px;} .difficulty-selection h3 {font-size: 0.9em;} .difficulty-button {padding: 6px 10px; font-size:0.7em;} }
+    </style>
+</head>
+<body>
+    <div class="game-header"><h1>FALLING PIJAS</h1><p>Um Jogo Original da Jalambi Pinto Games</p></div>
+    <div class="game-container">
+        <div class="how-to-play-container"><img src="images/como_jogar.png" alt="Como Jogar Falling Pijas"></div>
+        <div class="difficulty-selection" id="difficultySelection">
+            <h3>ESCOLHA A POTÊNCIA:</h3>
+            <button class="difficulty-button" data-difficulty="broxa">BROXA</button>
+            <button class="difficulty-button" data-difficulty="mole">MOLE</button>
+            <button class="difficulty-button" data-difficulty="viagra" selected>VIAGRA (Média)</button>
+            <button class="difficulty-button" data-difficulty="duro">DURO</button>
+            <button class="difficulty-button" data-difficulty="ereto">ERETO (Hardcore)</button>
+        </div>
+        <div class="game-info">
+            <div>PONTOS: <span id="score">0</span></div>
+            <div>VIDAS: <span id="lives">❤️❤️❤️❤️❤️</span></div>
+        </div>
+        <div class="game-area" id="gameArea">
+            <div id="eretoOverlay"></div>
+            <canvas id="gameCanvas"></canvas>
+            <div id="playerCollisionDebug"></div>
+            <img src="images/idle.gif" alt="Jogador" id="player" class="player-sprite">
+        </div>
+        <div class="game-controls"><button id="startButton">Iniciar Jogo</button><button id="resetButton" style="display:none;">Resetar</button></div>
+    </div>
+    <a href="index.html" class="back-to-site-btn" id="backToSiteButton">Voltar ao Site Principal</a>
+
+    <audio id="game-bgm-sound" src="https://files.catbox.moe/94vfy5.mp3" loop preload="auto"></audio>
+    <audio id="eating-sound" src="https://files.catbox.moe/tylxe2.mp3" preload="auto"></audio>
+    <audio id="powerup-sound" src="https://files.catbox.moe/ljuguk.mp3" preload="auto"></audio>
+    <audio id="death-sound" src="https://files.catbox.moe/k1j5zo.mp3" preload="auto"></audio>
+
+    <script>
+        // --- Constantes e Variáveis Globais (como antes) ---
+        const gameCanvas = document.getElementById('gameCanvas');
+        const ctx = gameCanvas.getContext('2d');
+        const gameArea = document.getElementById('gameArea');
+        const playerImg = document.getElementById('player');
+        const playerCollisionDebugImg = document.getElementById('playerCollisionDebug');
+        const scoreDisplay = document.getElementById('score');
+        const livesDisplay = document.getElementById('lives');
+        const startButton = document.getElementById('startButton');
+        const resetButton = document.getElementById('resetButton');
+        const backToSiteButton = document.getElementById('backToSiteButton');
+        const difficultyButtons = document.querySelectorAll('.difficulty-button');
+        const eretoOverlay = document.getElementById('eretoOverlay');
+
+        const gameBgm = document.getElementById('game-bgm-sound');
+        const eatingSound = document.getElementById('eating-sound');
+        const powerupSound = document.getElementById('powerup-sound'); // Usado para boost e farofa
+        const deathSound = document.getElementById('death-sound');
+
+        let score = 0;
+        let lives = 5;
+        const maxLives = 5; // Máximo de vidas
+        let pijasRuinsComidas = 0;
+        let isGameRunning = false;
+        let userInteractedWithGame = false;
+
+        const difficultySettings = {
+            broxa:  { speed: 1.0, frequency: 0.012, farofaChance: 0.15, bgmRate: 0.8 }, // 15% chance de farofa
+            mole:   { speed: 1.3, frequency: 0.018, farofaChance: 0.10, bgmRate: 0.9 }, // 10%
+            viagra: { speed: 1.8, frequency: 0.025, farofaChance: 0.07, bgmRate: 1.0 }, // 7%
+            duro:   { speed: 2.3, frequency: 0.030, farofaChance: 0.04, bgmRate: 1.1 }, // 4%
+            ereto:  { speed: 2.8, frequency: 0.038, farofaChance: 0.02, bgmRate: 1.3 }  // 2%
+        };
+        let currentDifficulty = 'viagra';
+        let pijaBaseSpeed = difficultySettings[currentDifficulty].speed;
+        let pijaSpawnFrequency = difficultySettings[currentDifficulty].frequency;
+        let farofaSpawnChance = difficultySettings[currentDifficulty].farofaChance;
+        let currentPijaSpeed = pijaBaseSpeed;
+
+        const pijas = []; // Array para todos os itens caindo (pijas, zupp, farofa)
+        const itemBaseOriginalWidths = { // Renomeado para item e adicionado farofa
+            good: 140, bad: 145, zupp: 85, farofa: 100 // Tamanho base para farofa
+        };
+
+        const playerState = { x: 0, visualWidth: 250, collisionWidth: 100, collisionHeight: 250, speed: 12,
+            get y() { return gameCanvas.height - this.collisionHeight - 10; },
+            get collisionX() { return this.x + (this.visualWidth - this.collisionWidth) / 2; }
+        };
+        playerCollisionDebugImg.style.height = `${playerState.collisionHeight}px`;
+        playerCollisionDebugImg.style.width = `${playerState.collisionWidth}px`;
+
+        // Carregar todas as imagens de itens
+        const pijaBoaImg = new Image(); const pijaRuimImg = new Image(); const aguaSanitariaImg = new Image(); const farofaImg = new Image();
+        let pijaBoaAspectRatio, pijaRuimAspectRatio, aguaSanitariaAspectRatio, farofaAspectRatio;
+
+        pijaBoaImg.onload = () => { pijaBoaAspectRatio = pijaBoaImg.naturalWidth / pijaBoaImg.naturalHeight;}; pijaBoaImg.src = 'images/pija_boa.png';
+        pijaRuimImg.onload = () => { pijaRuimAspectRatio = pijaRuimImg.naturalWidth / pijaRuimImg.naturalHeight;}; pijaRuimImg.src = 'images/pija_ruim.png';
+        aguaSanitariaImg.onload = () => { aguaSanitariaAspectRatio = aguaSanitariaImg.naturalWidth / aguaSanitariaImg.naturalHeight;}; aguaSanitariaImg.src = 'images/agua_sanitaria.png';
+        farofaImg.onload = () => { farofaAspectRatio = farofaImg.naturalWidth / farofaImg.naturalHeight;}; farofaImg.src = 'images/farofa.png'; // Carrega a farofa
+
+        // --- Funções Auxiliares (playSound, resizeCanvas, etc. como antes) ---
+        function playSound(soundElement) { if (soundElement && userInteractedWithGame) { soundElement.currentTime = 0; soundElement.play().catch(e => console.error("Erro som:", e)); } }
+        function resizeCanvas() { gameCanvas.width = gameArea.offsetWidth; gameCanvas.height = gameArea.offsetHeight; playerState.x = gameCanvas.width / 2 - playerState.visualWidth / 2; updatePlayerVisualPosition(); }
+        window.addEventListener('resize', resizeCanvas);
+        function updatePlayerVisualPosition() { playerImg.style.left = `${playerState.x}px`; playerCollisionDebugImg.style.left = `${playerState.collisionX}px`; playerCollisionDebugImg.style.bottom = `10px`; }
+        function updateLivesDisplay() { livesDisplay.textContent = '❤️'.repeat(lives) + (lives < maxLives ? '🖤'.repeat(maxLives - lives) : ''); }
+        function changePlayerGif(state) { playerImg.src = `images/${state}.gif`; }
+        function checkPijaOverlap(newPijaX, newPijaWidth) {
+            const minGap = 15; // Aumentei um pouco o gap
+            for (const p of pijas) {
+                if (p.y < 60) { // Só checa pijas que ainda estão no topo
+                    const pRight = p.x + p.width; const newPijaRight = newPijaX + newPijaWidth;
+                    if (newPijaX < pRight + minGap && newPijaRight > p.x - minGap) { return true; }
+                }
+            } return false;
+        }
+
+
+        function createItem() { // Renomeado de createPija para createItem
+            const itemRoll = Math.random(); // Para decidir qual tipo de item
+            let type, img, originalWidth, aspectRatio, points, isBad, isBoost, isLifeUp;
+
+            // Probabilidades: Pija Boa (55%), Pija Ruim (25%), Zupp (10%), Farofa (chance varia com dificuldade)
+            // A chance da farofa "corta" as outras.
+            if (itemRoll < farofaSpawnChance) { // Chance de Farofa primeiro
+                type = 'farofa'; img = farofaImg; originalWidth = itemBaseOriginalWidths.farofa; aspectRatio = farofaAspectRatio;
+                points = 2; isBad = false; isBoost = false; isLifeUp = true;
+            } else if (itemRoll < farofaSpawnChance + 0.55) { // Pija Boa
+                type = 'boa'; img = pijaBoaImg; originalWidth = itemBaseOriginalWidths.good; aspectRatio = pijaBoaAspectRatio;
+                points = 10; isBad = false; isBoost = false; isLifeUp = false;
+            } else if (itemRoll < farofaSpawnChance + 0.55 + 0.25) { // Pija Ruim
+                type = 'ruim'; img = pijaRuimImg; originalWidth = itemBaseOriginalWidths.bad; aspectRatio = pijaRuimAspectRatio;
+                points = -5; isBad = true; isBoost = false; isLifeUp = false;
+            } else { // Zupp (Água Sanitária)
+                type = 'boost'; img = aguaSanitariaImg; originalWidth = itemBaseOriginalWidths.zupp; aspectRatio = aguaSanitariaAspectRatio;
+                points = 5; isBad = false; isBoost = true; isLifeUp = false;
+            }
+
+
+            if (!aspectRatio || aspectRatio === 0) { console.warn(`Aspect ratio para ${type} não pronto, pulando item.`); return; }
+            const itemVisualHeight = originalWidth * (Math.random() * 0.25 + 0.85);
+            const itemVisualWidth = itemVisualHeight / aspectRatio;
+            let itemX = Math.random() * (gameCanvas.width - itemVisualWidth);
+
+            let attempts = 0;
+            while (checkPijaOverlap(itemX, itemVisualWidth) && attempts < 10) {
+                itemX = Math.random() * (gameCanvas.width - itemVisualWidth);
+                attempts++;
+            }
+
+            pijas.push({
+                x: itemX, y: -itemVisualHeight, width: itemVisualWidth, height: itemVisualHeight,
+                rotation: (type === 'farofa' ? 0 : Math.PI / 2), // Farofa não rotaciona, pijas sim
+                type, img, points, isBad, isBoost, isLifeUp
+            });
+        }
+
+        let boostActive = false; let boostTimeout;
+        function activateBoost() {
+            if (boostActive) clearTimeout(boostTimeout);
+            boostActive = true; currentPijaSpeed = pijaBaseSpeed * 0.5; playerImg.style.filter = "brightness(1.5) hue-rotate(90deg)";
+            playSound(powerupSound); // Som do powerup
+            boostTimeout = setTimeout(() => { currentPijaSpeed = pijaBaseSpeed; playerImg.style.filter = "none"; boostActive = false; }, 5000);
+        }
+
+        const keysPressed = {};
+        document.addEventListener('keydown', (e) => { keysPressed[e.key.toLowerCase()] = true; if (['arrowleft', 'arrowright', 'a', 'd'].includes(e.key.toLowerCase())) e.preventDefault(); });
+        document.addEventListener('keyup', (e) => { keysPressed[e.key.toLowerCase()] = false; });
+        function handlePlayerMovement() {
+            if (keysPressed['arrowleft'] || keysPressed['a']) { playerState.x -= playerState.speed; }
+            if (keysPressed['arrowright'] || keysPressed['d']) { playerState.x += playerState.speed; }
+            if (playerState.x < 0) playerState.x = 0;
+            if (playerState.x + playerState.visualWidth > gameCanvas.width) playerState.x = gameCanvas.width - playerState.visualWidth;
+            updatePlayerVisualPosition();
+        }
+
+        function gameLoop() {
+            if (!isGameRunning) return;
+            handlePlayerMovement(); ctx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
+            if (Math.random() < pijaSpawnFrequency) { createItem(); } // Usa a função renomeada
+
+            for (let i = pijas.length - 1; i >= 0; i--) {
+                const item = pijas[i]; item.y += currentPijaSpeed;
+                if (item.img.complete && item.width && item.height) {
+                    ctx.save(); ctx.translate(item.x + item.width / 2, item.y + item.height / 2);
+                    ctx.rotate(item.rotation); // Usa a rotação definida para o item
+                    // Se a rotação for PI/2 (90 graus), inverte w/h no drawImage. Se for 0, não inverte.
+                    if (item.rotation === Math.PI / 2) {
+                        ctx.drawImage(item.img, -item.height / 2, -item.width / 2, item.height, item.width);
+                    } else {
+                        ctx.drawImage(item.img, -item.width / 2, -item.height / 2, item.width, item.height);
+                    }
+                    ctx.restore();
+                }
+                const itemHitbox = { x: item.x, y: item.y, width: item.width, height: item.height };
+                if (itemHitbox.x < playerState.collisionX + playerState.collisionWidth &&
+                    itemHitbox.x + itemHitbox.width > playerState.collisionX &&
+                    itemHitbox.y < playerState.y + playerState.collisionHeight &&
+                    itemHitbox.y + itemHitbox.height > playerState.y) {
+
+                    if (item.isBoost || item.isLifeUp) {
+                        playSound(powerupSound); // Som para boost e farofa
+                    } else {
+                        playSound(eatingSound); // Som de comer para pijas boas/ruins
+                    }
+
+                    changePlayerGif('eating'); setTimeout(() => { if(isGameRunning) changePlayerGif('idle'); }, 300);
+                    score += item.points; scoreDisplay.textContent = score;
+
+                    if (item.isBad) {
+                        pijasRuinsComidas++; lives--; updateLivesDisplay();
+                        if (pijasRuinsComidas >= 3) { gameOver("Engoliu muita pija estragada!"); return; }
+                        if (lives <= 0) { gameOver("Acabaram as vidas!"); return; }
+                    } else if (item.isBoost) {
+                        activateBoost(); // Som já tocado acima
+                    } else if (item.isLifeUp) {
+                        if (lives < maxLives) {
+                            lives++;
+                            updateLivesDisplay();
+                        }
+                    }
+                    pijas.splice(i, 1);
+                } else if (item.y > gameCanvas.height) { // Item passou por baixo
+                    if (item.type === 'boa' || item.type === 'farofa') { // Perde vida se pija boa ou farofa cair
+                        lives--; updateLivesDisplay();
+                        if (lives <= 0) { gameOver("Deixou coisas boas escaparem!"); return; }
+                    }
+                    pijas.splice(i, 1);
+                }
+            }
+            requestAnimationFrame(gameLoop);
+        }
+
+        difficultyButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                if (isGameRunning) return;
+                currentDifficulty = this.dataset.difficulty;
+                pijaBaseSpeed = difficultySettings[currentDifficulty].speed;
+                pijaSpawnFrequency = difficultySettings[currentDifficulty].frequency;
+                farofaSpawnChance = difficultySettings[currentDifficulty].farofaChance; // Atualiza chance da farofa
+                currentPijaSpeed = pijaBaseSpeed;
+                difficultyButtons.forEach(btn => btn.classList.remove('selected'));
+                this.classList.add('selected');
+                if (gameBgm) gameBgm.playbackRate = difficultySettings[currentDifficulty].bgmRate;
+                if (currentDifficulty === 'ereto') eretoOverlay.style.display = 'block';
+                else eretoOverlay.style.display = 'none';
+            });
+        });
+
+        function startGame() {
+            // ... (lógica de startGame como antes, mas usa as variáveis de dificuldade corretas)
+            if (isGameRunning) return;
+            if (!userInteractedWithGame) { userInteractedWithGame = true; }
+            isGameRunning = true; score = 0; lives = 5; pijasRuinsComidas = 0;
+            currentPijaSpeed = difficultySettings[currentDifficulty].speed;
+            pijaSpawnFrequency = difficultySettings[currentDifficulty].frequency;
+            farofaSpawnChance = difficultySettings[currentDifficulty].farofaChance;
+
+            if (boostActive) { clearTimeout(boostTimeout); playerImg.style.filter = "none"; boostActive = false; }
+            pijas.length = 0; scoreDisplay.textContent = score; updateLivesDisplay(); changePlayerGif('idle');
+            document.getElementById('difficultySelection').style.display = 'none';
+            startButton.style.display = 'none'; resetButton.style.display = 'inline-block';
+            resizeCanvas(); updatePlayerVisualPosition();
+            
+            if(gameBgm) {
+                gameBgm.playbackRate = difficultySettings[currentDifficulty].bgmRate;
+                if (currentDifficulty === 'ereto') eretoOverlay.style.display = 'block'; else eretoOverlay.style.display = 'none';
+                playSound(gameBgm);
+            }
+            gameLoop();
+        }
+
+        function gameOver(message = "Sua pontuação:") {
+            // ... (lógica de gameOver como antes)
+            isGameRunning = false; if(gameBgm) gameBgm.pause(); playSound(deathSound);
+            changePlayerGif('ohno');
+            if (boostActive) { clearTimeout(boostTimeout); playerImg.style.filter = "none"; boostActive = false; }
+            if(currentDifficulty !== 'ereto') eretoOverlay.style.display = 'none';
+            setTimeout(() => { alert(`FIM DE JOGO! ${message} ${score}. Clique em Tentar Novamente!`); }, 700);
+            resetButton.textContent = "Tentar Novamente";
+        }
+        function resetGame() {
+            // ... (lógica de resetGame como antes)
+            isGameRunning = false; if(gameBgm) gameBgm.pause();
+            if (boostActive) { clearTimeout(boostTimeout); playerImg.style.filter = "none"; boostActive = false; }
+            document.getElementById('difficultySelection').style.display = 'block';
+            if (gameBgm) gameBgm.playbackRate = difficultySettings[currentDifficulty].bgmRate;
+            if (currentDifficulty === 'ereto') eretoOverlay.style.display = 'block'; else eretoOverlay.style.display = 'none';
+            setTimeout(() => {
+                changePlayerGif('idle'); startButton.style.display = 'inline-block'; resetButton.style.display = 'none';
+                resetButton.textContent = "Resetar"; score = 0; lives = 5; pijasRuinsComidas = 0;
+                scoreDisplay.textContent = score; updateLivesDisplay(); pijas.length = 0;
+                ctx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
+                resizeCanvas(); updatePlayerVisualPosition();
+            }, 700);
+        }
+
+        startButton.addEventListener('click', startGame);
+        resetButton.addEventListener('click', resetGame);
+        backToSiteButton.addEventListener('click', () => { if(gameBgm && !gameBgm.paused) { gameBgm.pause(); gameBgm.currentTime = 0; }});
+        updateLivesDisplay();
+        resizeCanvas();
+    </script>
+</body>
+</html>

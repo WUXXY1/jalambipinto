@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>O Dia Que a Terra Ficou Molestada - Jalambi Pinto Filmes</title>
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="images/favicon.png">
+    <link rel="icon" sizes="64x64" href="images/favicon.png>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/movie-detail.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <style>
+        /* Estilo para o player de vídeo */
+        .video-player-container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto 20px auto;
+            background-color: #000;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--box-shadow);
+        }
+        .video-player-container video {
+            display: block;
+            width: 100%;
+            height: auto;
+            border-radius: var(--border-radius);
+        }
+        /* Estilo para a Seção da Promoção */
+        .movie-promotion {
+            margin-top: 40px;
+            padding: 25px;
+            background-color: var(--card-bg);
+            border: 2px dashed var(--primary-color);
+            border-radius: var(--border-radius);
+            text-align: center;
+        }
+        .movie-promotion h3 {
+            color: var(--primary-hover-color);
+            font-size: 1.9rem;
+            margin-bottom: 15px;
+        }
+        .movie-promotion p {
+            font-size: 1.15rem;
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+        .movie-promotion strong {
+            color: #fff;
+            font-weight: 700;
+        }
+
+        /* Estilos para o Easter Egg Fullscreen Video */
+        #easter-egg-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+            z-index: 10000; /* Acima de tudo */
+            display: none; /* Escondido por padrão */
+            justify-content: center;
+            align-items: center;
+        }
+        #easter-egg-video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* Garante que o vídeo caiba na tela sem cortar */
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo-container">
+                <img src="images/JLMB logo.png" alt="Jalambi pinto Logo">
+                <h1 class="site-title">Jalambi Pinto Movies</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html" class="nav-item">Home</a></li>
+                    <li><a href="index.html#filmes" class="nav-item">Filmes</a></li>
+                    <li><a href="index.html#proximos" class="nav-item">Próximos</a></li>
+                    <li><a href="index.html#sobre" class="nav-item">Sobre</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="movie-detail">
+        <div class="container">
+            <div class="movie-detail-content">
+                <div class="movie-poster">
+                    <img src="images/o_dia_que_a_terra_ficou_molestada.webp" alt="O Dia Que a Terra Ficou Molestada">
+                </div>
+                <div class="movie-info-detail">
+                    <h2>O Dia Que a Terra Ficou Molestada</h2>
+                    <div class="movie-meta">
+                        <span class="movie-year">Fenômeno Recente</span>
+                        <span class="movie-duration">Inesquecível</span>
+                        <span class="movie-rating">18+ (Prepare-se)</span>
+                    </div>
+                    <div class="movie-production">
+                        <p><strong>Produção:</strong> Da Jalambi Pinto Filmes</p>
+                        <p><strong>Com:</strong> Matheus e Kid Bengala</p>
+                        <p><em>Uma história de amor gay.</em></p>
+                        <p><strong>Bilheteria:</strong> 10 Bilhões e contando!</p>
+                    </div>
+                    <div class="movie-synopsis">
+                        <h3>Sinopse Impactante (e Saliente!)</h3>
+                        <p>Era um dia como qualquer outro no paraíso da saliência, onde os homossexuais mais vigorosos e desinibidos se entregavam à arte sublime da putaria casual. Mal sabiam eles que, das profundezas cósmicas, um PENIS GIGANTESCO emergia, com um apetite voraz e uma ameaça iminente à existência da humanidade!</p>
+                        <p>Diante do terror fálico interplanetário, apenas uma solução lendária poderia salvar o mundo: uma BIMBADA ÉPICA, daquelas de fazer tremer os alicerces da realidade! Nossos heróis, ungidos pela luxúria e armados com uma disposição inabalável, unem suas... forças... em um ato de sacrifício carnal.</p>
+                        <p>Os gemidos ecoaram pela estratosfera, os orgasmos atingiram frequências ultrassônicas, e a cama... ah, a cama se tornou um altar de salvação! A pressão foi tanta, a sinfonia de prazer tão avassaladora, que o Penis Gigante não suportou o nivel de tesão. Em um clímax cósmico de proporções bíblicas, ele SE ESGUICHOU para longe da Terra, banhando galáxias distantes com sua... essência... derrotada.</p>
+                        <p><strong>'O Dia Que a Terra Ficou Molestada':</strong> uma comédia onde o prazer não só dá tesão, mas também salva o planeta!</p>
+                    </div>
+                    <div class="movie-cast">
+                        <h3>Elenco Estelar</h3>
+                        <ul>
+                            <li>Matheus (O Herói saliente)</li>
+                            <li>Kid Bengala (A Lenda Grandona)</li>
+                            <li>A Terra (Em seu papel mais estuprado)</li>
+                            <li>Seu Pai (Sim o do espectador)</li>
+                            <li>Pau Linlile (O Artefato Multifuncional)</li>
+                        </ul>
+                    </div>
+                    <div class="movie-trailer">
+                        <h3>Trailer Oficial (Cenas Fortes!)</h3>
+                        <div class="video-player-container">
+                            <video controls preload="auto" poster="images/o_dia_que_a_terra_ficou_molestada.webp">
+                                <source src="https://files.catbox.moe/jgfrh8.mp4" type="video/mp4">
+                                Seu navegador não suporta o elemento de vídeo.
+                            </video>
+                        </div>
+                    </div>
+                    <div class="movie-gallery">
+                        <h3>Galeria de Momentos Marcantes</h3>
+                        <div class="gallery-images">
+                            <div class="gallery-image-placeholder">
+                                <p>Imagens que falam mais que mil palavras (e gemidos).</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="movie-promotion">
+                        <h3>🎉 PROMOÇÃO EXPLOSIVA! 🎉</h3>
+                        <p>Compre o DVD de "O Dia Que a Terra Ficou Molestada" e tenha a CHANCE ÚNICA de ganhar um <strong>Pau Super Especial</strong> – o lendário e ORIGINAL <strong>Pau Linlile™</strong>! Garanta já o seu e não perca esta oportunidade de possuir um artefato de poder incomparável!</p>
+                    </div>
+
+                    <div class="back-button">
+                        <a href="index.html#filmes" class="btn">Voltar (se conseguir processar tudo)</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="related-movies">
+        <div class="container">
+            <h2>Outras Obras de Impacto</h2>
+            <div class="related-movies-grid">
+                <div class="movie-card">
+                    <img src="images/peideinafarofaHD.png" alt="Peidei na Farofa">
+                    <div class="movie-info">
+                        <h3>Peidei na Farofa</h3>
+                        <p>O clássico que iniciou tudo.</p>
+                        <a href="peidei-na-farofa.html" class="btn">Ver Detalhes</a>
+                    </div>
+                </div>
+                <div class="movie-card">
+                    <img src="images/negoman_filme.png" alt="Nego Man - O Filme">
+                    <div class="movie-info">
+                        <h3>Nego Man - O Filme</h3>
+                        <p>Outra jornada surreal.</p>
+                        <a href="nego-man.html" class="btn">Ver Detalhes</a>
+                    </div>
+                </div>
+                 <div class="movie-card">
+                    <img src="images/pijadeouro.png" alt="ANTONIO Y LAS PIJAS DE ORO">
+                    <div class="movie-info">
+                        <h3>ANTONIO Y LAS PIJAS DE ORO</h3>
+                        <p>Aventura internacional.</p>
+                        <a href="antonio-pijas-de-oro.html" class="btn">Ver Detalhes</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>© Ano do Impacto - Jalambi Pinto Filmes. A Terra nunca mais foi a mesma.</p>
+        </div>
+    </footer>
+
+    <!-- Elementos do Easter Egg -->
+    <div id="easter-egg-overlay">
+        <video id="easter-egg-video" src="https://files.catbox.moe/aupgd1.mp4" controls></video>
+    </div>
+
+    <button id="mute-button" class="mute-button">Mute BGM</button>
+    <audio id="bgm-sound" src="https://files.catbox.moe/s5v55s.mp3" autoplay loop preload="auto"></audio>
+    <audio id="hover-sound" src="https://files.catbox.moe/7ggm5j.mp3" preload="auto"></audio>
+    <audio id="about-sound" src="https://files.catbox.moe/6f07t8.mp3" preload="auto"></audio>
+    <script src="js/script.js"></script>
+    <script src="js/animations.js"></script>
+
+    <!-- Script para o Easter Egg -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const secretCode = 'eunaosougay';
+            let keystrokeSequence = [];
+            const easterEggOverlay = document.getElementById('easter-egg-overlay');
+            const easterEggVideo = document.getElementById('easter-egg-video');
+
+            // Pausa a BGM principal se estiver tocando
+            const mainBgm = document.getElementById('bgm-sound');
+
+            document.addEventListener('keydown', (e) => {
+                // Adiciona a tecla pressionada à sequência
+                keystrokeSequence.push(e.key.toLowerCase());
+
+                // Mantém a sequência com o mesmo tamanho do código secreto
+                if (keystrokeSequence.length > secretCode.length) {
+                    keystrokeSequence.shift(); // Remove o primeiro item
+                }
+
+                // Verifica se a sequência corresponde ao código secreto
+                if (keystrokeSequence.join('') === secretCode) {
+                    console.log('CÓDIGO SECRETO ATIVADO! Preparar para o Matheus pirar!');
+                    
+                    // Pausa a BGM principal
+                    if (mainBgm && !mainBgm.paused) {
+                        mainBgm.pause();
+                    }
+
+                    // Exibe o overlay e toca o vídeo
+                    easterEggOverlay.style.display = 'flex';
+                    easterEggVideo.currentTime = 0;
+                    easterEggVideo.play().catch(error => {
+                        console.error("Erro ao tentar tocar o vídeo do easter egg:", error);
+                        // Tenta de novo sem autoplay se falhar
+                        easterEggOverlay.style.display = 'flex';
+                    });
+
+                    // Tenta entrar em tela cheia (requer interação do usuário, mas pode funcionar aqui)
+                    if (easterEggOverlay.requestFullscreen) {
+                        easterEggOverlay.requestFullscreen();
+                    } else if (easterEggOverlay.webkitRequestFullscreen) { /* Safari */
+                        easterEggOverlay.webkitRequestFullscreen();
+                    } else if (easterEggOverlay.msRequestFullscreen) { /* IE11 */
+                        easterEggOverlay.msRequestFullscreen();
+                    }
+
+                    // Reseta a sequência para que o código não seja ativado repetidamente
+                    keystrokeSequence = [];
+                }
+            });
+
+            // Adiciona um listener para sair da tela cheia e parar o vídeo
+            document.addEventListener('fullscreenchange', () => {
+                if (!document.fullscreenElement) {
+                    easterEggVideo.pause();
+                    easterEggOverlay.style.display = 'none';
+                    // Opcional: retomar a BGM principal
+                    if (mainBgm && mainBgm.paused) {
+                        mainBgm.play().catch(e => console.error("Erro ao retomar BGM", e));
+                    }
+                }
+            });
+
+            // Adiciona listener para quando o vídeo do easter egg terminar
+            easterEggVideo.addEventListener('ended', () => {
+                if (document.fullscreenElement) {
+                    document.exitFullscreen();
+                } else {
+                    easterEggVideo.pause();
+                    easterEggOverlay.style.display = 'none';
+                    if (mainBgm && mainBgm.paused) {
+                        mainBgm.play().catch(e => console.error("Erro ao retomar BGM", e));
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
