@@ -1,0 +1,148 @@
+.sprite-0000 {
+     background: url(sprite_sheet.png);
+     display: inline-block;
+     height: 256px;
+     width: 256px;
+     background-position: -0px -0px;
+ }
+ .sprite-0001 {
+     background: url(sprite_sheet.png);
+     display: inline-block;
+     height: 256px;
+     width: 256px;
+     background-position: -256px -0px;
+ }
+ .sprite-0002 {
+     background: url(sprite_sheet.png);
+     display: inline-block;
+     height: 256px;
+     width: 256px;
+     background-position: -512px -0px;
+ }
+ .sprite-0003 {
+     background: url(sprite_sheet.png);
+     display: inline-block;
+     height: 256px;
+     width: 256px;
+     background-position: -768px -0px;
+ }
+ .sprite-0004 {
+     background: url(sprite_sheet.png);
+     display: inline-block;
+     height: 256px;
+     width: 256px;
+     background-position: -1024px -0px;
+ }
+ .sprite-0005 {
+     background: url(sprite_sheet.png);
+     display: inline-block;
+     height: 256px;
+     width: 256px;
+     background-position: -0px -256px;
+ }
+ .sprite-0006 {
+     background: url(sprite_sheet.png);
+     display: inline-block;
+     height: 256px;
+     width: 256px;
+     background-position: -256px -256px;
+ }
+ .sprite-0007 {
+     background: url(sprite_sheet.png);
+     display: inline-block;
+     height: 256px;
+     width: 256px;
+     background-position: -512px -256px;
+ }
+ .sprite-0008 {
+     background: url(sprite_sheet.png);
+     display: inline-block;
+     height: 256px;
+     width: 256px;
+     background-position: -768px -256px;
+ }
+ .sprite-0009 {
+     background: url(sprite_sheet.png);
+     display: inline-block;
+     height: 256px;
+     width: 256px;
+     background-position: -1024px -256px;
+ }
+ .sprite-0010 {
+     background: url(sprite_sheet.png);
+     display: inline-block;
+     height: 256px;
+     width: 256px;
+     background-position: -0px -512px;
+ }
+ .sprite-0011 {
+     background: url(sprite_sheet.png);
+     display: inline-block;
+     height: 256px;
+     width: 256px;
+     background-position: -256px -512px;
+ }
+ .sprite-0012 {
+     background: url(sprite_sheet.png);
+     display: inline-block;
+     height: 256px;
+     width: 256px;
+     background-position: -512px -512px;
+ }
+ .sprite-0013 {
+     background: url(sprite_sheet.png);
+     display: inline-block;
+     height: 256px;
+     width: 256px;
+     background-position: -768px -512px;
+ }
+ .sprite-0014 {
+     background: url(sprite_sheet.png);
+     display: inline-block;
+     height: 256px;
+     width: 256px;
+     background-position: -1024px -512px;
+ }
+ .sprite-0015 {
+     background: url(sprite_sheet.png);
+     display: inline-block;
+     height: 256px;
+     width: 256px;
+     background-position: -0px -768px;
+ }
+ .sprite-0016 {
+     background: url(sprite_sheet.png);
+     display: inline-block;
+     height: 256px;
+     width: 256px;
+     background-position: -256px -768px;
+ }
+ .sprite-0017 {
+     background: url(sprite_sheet.png);
+     display: inline-block;
+     height: 256px;
+     width: 256px;
+     background-position: -512px -768px;
+ }
+ .sprite-0018 {
+     background: url(sprite_sheet.png);
+     display: inline-block;
+     height: 256px;
+     width: 256px;
+     background-position: -768px -768px;
+ }
+ .sprite-0019 {
+     background: url(sprite_sheet.png);
+     display: inline-block;
+     height: 256px;
+     width: 256px;
+     background-position: -1024px -768px;
+ }
+ .sprite-0020 {
+     background: url(sprite_sheet.png);
+     display: inline-block;
+     height: 256px;
+     width: 256px;
+     background-position: -0px -1024px;
+ }
+ 

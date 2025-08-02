@@ -1,0 +1,520 @@
+/* --- START OF FILE style.css --- */
+
+/* Definições @font-face para fontes customizadas */
+@font-face {
+  font-family: 'CopperplateGothicBold';
+  src: url('../fonts/copperplategothic_bold.ttf') format('truetype');
+  font-weight: bold; /* Ou normal, dependendo de como a fonte foi criada */
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'LTSipRegular';
+  src: url('../fonts/LTSip-Regular1.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* Estilos gerais */
+:root {
+    --primary-color: #ff6b00;
+    --primary-hover-color: #e65c00;
+    --dark-bg: #101010;
+    --card-bg: #181818; /* Um pouco mais claro que o fundo principal */
+    --text-color: #e0e0e0;
+    --text-muted-color: #a0a0a0;
+    --border-color: #2c2c2c;
+    /* Fontes padrão do Google Fonts como fallback ou para outros elementos */
+    --font-headings-default: 'Poppins', sans-serif;
+    --font-body-default: 'Roboto', sans-serif;
+    --box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3); /* Sombra mais suave e difusa */
+    --box-shadow-hover: 0 12px 30px rgba(0, 0, 0, 0.4);
+    --border-radius: 8px;
+    --transition-speed: 0.3s;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-body-default); /* Default para o corpo */
+    line-height: 1.7;
+    background-color: var(--dark-bg);
+    color: var(--text-color);
+    font-size: 16px;
+}
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+a {
+    text-decoration: none;
+    color: var(--primary-color);
+    transition: color var(--transition-speed) ease;
+}
+
+a:hover {
+    color: var(--primary-hover-color);
+}
+
+ul {
+    list-style: none;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-headings-default); /* Default para títulos */
+    color: var(--primary-color);
+    margin-bottom: 0.8em;
+    line-height: 1.3;
+}
+
+h1 { font-size: 2.8rem; }
+h2 { font-size: 2.2rem; } /* Default h2 size */
+h3 { font-size: 1.6rem; }
+
+p {
+    margin-bottom: 1em;
+    color: var(--text-muted-color);
+     /* Herda font-family do body (Roboto por padrão) */
+}
+
+/* Header */
+header {
+    background-color: rgba(0, 0, 0, 0.8);
+    padding: 15px 0;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border-color);
+    transition: background-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+}
+
+header.header-scroll {
+    background-color: rgba(0, 0, 0, 0.95);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+header .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+}
+
+.logo-container img {
+    height: 45px;
+    margin-right: 12px;
+}
+
+header h1 { /* Título do site NO HEADER (Jalambi pinto Movies) */
+    font-family: 'CopperplateGothicBold', var(--font-headings-default); /* NOVA FONTE APLICADA */
+    font-size: 1.8rem;
+    color: #fff;
+    margin-bottom: 0;
+    letter-spacing: 0.5px; /* Ajuste opcional para Copperplate */
+}
+header h1.site-title {
+    position: relative;
+     /* Herda a font-family de 'header h1' */
+}
+
+
+nav ul {
+    display: flex;
+}
+
+nav ul li {
+    margin-left: 25px;
+}
+
+nav ul li a {
+    font-weight: 600;
+    font-family: var(--font-headings-default); /* Poppins para links de navegação */
+    color: var(--text-color);
+    font-size: 0.95rem;
+    letter-spacing: 0.5px;
+    padding-bottom: 5px;
+}
+
+nav ul li a:hover,
+nav ul li a.active {
+    color: var(--primary-color);
+}
+
+/* Hero Section - index.html */
+.hero {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.85)), url('../images/jlb.png');
+    background-size: cover;
+    background-position: center center;
+    min-height: 75vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: #fff;
+    padding: 60px 0;
+    position: relative;
+}
+
+.hero::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.1);
+    z-index: 1;
+}
+
+.hero .container {
+    position: relative;
+    z-index: 2;
+}
+
+
+.hero-logo {
+    max-width: 200px;
+    margin: 0 auto 30px;
+    opacity: 0.8;
+}
+
+.hero h2 { /* "Bem-vindo ao site oficial da Jalambi pinto Movies" */
+    font-family: 'LTSipRegular', var(--font-headings-default); /* NOVA FONTE APLICADA */
+    font-size: 3.2rem; /* Pode precisar ajustar o tamanho com a nova fonte */
+    margin-bottom: 25px;
+    color: #fff;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
+    line-height: 1.3; /* Ajuste para a nova fonte */
+}
+
+.hero p { /* "Os melhores filmes de fazer você gozar de rir estão aqui!" */
+    font-family: 'LTSipRegular', var(--font-body-default); /* NOVA FONTE APLICADA */
+    font-size: 1.5rem; /* Pode precisar ajustar o tamanho */
+    margin-bottom: 40px;
+    color: var(--text-muted-color);
+    max-width: 650px; /* Pode precisar ajustar a largura */
+    margin-left: auto;
+    margin-right: auto;
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
+    line-height: 1.6; /* Ajuste para a nova fonte */
+}
+
+/* Seções genéricas (Filmes, Sobre, Próximos) */
+section {
+    padding: 70px 0;
+}
+
+section h2.section-title { /* Título das seções como "Nossos Filmes", "Próximos Lançamentos" */
+    font-family: var(--font-headings-default); /* Mantém Poppins para títulos de seção gerais */
+    text-align: center;
+    margin-bottom: 50px;
+    font-size: 2.5rem;
+}
+/* Para garantir que .about h2 não seja sobrescrito pela regra geral acima se tiver .section-title */
+/* Os seletores específicos para .hero h2 e .about h2 abaixo terão precedência */
+
+
+/* Movies Section */
+#filmes h2 { /* "Nossos Filmes" */
+    font-family: var(--font-headings-default); /* Mantém Poppins */
+}
+
+.movie-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+    gap: 35px;
+}
+
+.movie-card {
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    box-shadow: var(--box-shadow);
+    transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.movie-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--box-shadow-hover);
+}
+
+.movie-card img {
+    width: 100%;
+    height: 400px;
+    object-fit: cover;
+    border-bottom: 3px solid var(--primary-color);
+}
+
+.movie-info {
+    padding: 25px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.movie-info h3 { /* Título do filme no card */
+    font-family: var(--font-headings-default); /* Mantém Poppins */
+    font-size: 1.4rem;
+    margin-bottom: 12px;
+    color: #fff;
+}
+
+.movie-info p {
+    font-family: var(--font-body-default); /* Mantém Roboto */
+    font-size: 0.9rem;
+    color: var(--text-muted-color);
+    margin-bottom: 15px;
+    line-height: 1.5;
+}
+
+.movie-meta-info {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.movie-meta-info span {
+    background-color: rgba(255, 255, 255, 0.05);
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--text-muted-color);
+    border: 1px solid var(--border-color);
+}
+
+.btn {
+    display: inline-block;
+    background-color: var(--primary-color);
+    color: #fff;
+    padding: 12px 25px;
+    border-radius: var(--border-radius);
+    font-weight: 600;
+    font-family: var(--font-headings-default); /* Poppins para botões */
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: background-color var(--transition-speed) ease, transform var(--transition-speed) ease;
+    border: none;
+    cursor: pointer;
+    text-align: center;
+    margin-top: auto;
+}
+
+.btn:hover {
+    background-color: var(--primary-hover-color);
+    color: #fff;
+    transform: translateY(-2px);
+}
+
+/* About Section - index.html */
+.about {
+    background-color: var(--card-bg);
+}
+
+.about h2 { /* "Sobre a Jalambi pinto Movies" */
+    font-family: 'LTSipRegular', var(--font-headings-default); /* NOVA FONTE APLICADA */
+    font-size: 2.8rem; /* Ajuste o tamanho conforme necessário */
+    text-align: center;
+    margin-bottom: 30px; /* Ajuste a margem */
+    line-height: 1.3;
+}
+
+.about p { /* Parágrafos da seção Sobre */
+    font-family: 'LTSipRegular', var(--font-body-default); /* NOVA FONTE APLICADA */
+    font-size: 1.2rem; /* Ajuste o tamanho */
+    margin-bottom: 20px;
+    text-align: center;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+    color: var(--text-color);
+    line-height: 1.7; /* Ajuste para a nova fonte */
+}
+
+/* Coming Soon Section */
+#proximos h2 { /* "Próximos Lançamentos" */
+    font-family: var(--font-headings-default); /* Mantém Poppins */
+}
+.coming-soon-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 30px;
+}
+
+.coming-soon-card {
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    padding: 30px;
+    text-align: center;
+    box-shadow: var(--box-shadow);
+    border: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.coming-soon-card h3 {
+    font-family: var(--font-headings-default); /* Mantém Poppins */
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+    color: #fff;
+}
+
+.coming-soon-card p {
+    font-family: var(--font-body-default); /* Mantém Roboto */
+    color: var(--text-muted-color);
+    margin-bottom: 20px;
+    flex-grow: 1;
+}
+.coming-soon-card .btn {
+    margin-top: 10px;
+}
+
+/* Footer */
+footer {
+    background-color: #000;
+    padding: 30px 0;
+    text-align: center;
+    border-top: 1px solid var(--border-color);
+}
+
+footer p {
+    font-family: var(--font-body-default); /* Mantém Roboto */
+    color: var(--text-muted-color);
+    font-size: 0.9rem;
+    margin-bottom: 0;
+}
+
+/* Responsividade */
+@media screen and (max-width: 992px) {
+    .hero h2 { font-size: 2.8rem; } /* Ajuste para LTSipRegular */
+    .hero p { font-size: 1.3rem; } /* Ajuste para LTSipRegular */
+    .about h2 { font-size: 2.5rem; } /* Ajuste para LTSipRegular */
+    .about p { font-size: 1.1rem; } /* Ajuste para LTSipRegular */
+    .movie-grid { grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); }
+}
+
+@media screen and (max-width: 768px) {
+    body { font-size: 15px; }
+    header .container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .logo-container {
+        margin-bottom: 15px;
+    }
+    header h1 {
+        text-align: center;
+        font-size: 1.6rem; /* Ajuste para Copperplate em telas menores */
+    }
+
+    nav ul {
+        margin-top: 10px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    nav ul li {
+        margin: 5px 10px;
+    }
+
+    .hero { min-height: 60vh; }
+    .hero h2 { font-size: 2.2rem; } /* Ajuste para LTSipRegular */
+    .hero p { font-size: 1.2rem; } /* Ajuste para LTSipRegular */
+    .hero-logo { max-width: 150px; }
+
+    section { padding: 50px 0; }
+    /* section h2.section-title { font-size: 2rem; margin-bottom: 30px; } */
+    .about h2 { font-size: 2rem; } /* Ajuste para LTSipRegular */
+    .about p { font-size: 1rem; } /* Ajuste para LTSipRegular */
+
+    .movie-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 25px; }
+    .movie-card img { height: 320px; }
+}
+
+@media screen and (max-width: 480px) {
+    header h1 { font-size: 1.4rem; } /* Ajuste para Copperplate */
+    .hero { min-height: 50vh; }
+    .hero h2 { font-size: 1.8rem; } /* Ajuste para LTSipRegular */
+    .hero p { font-size: 1rem; } /* Ajuste para LTSipRegular */
+    .hero-logo { max-width: 120px; }
+
+    .movie-grid {
+        grid-template-columns: 1fr;
+    }
+    .movie-card img { height: auto; max-height: 400px; }
+    .coming-soon-grid { grid-template-columns: 1fr; }
+
+    .btn { padding: 10px 20px; font-size: 0.9rem; }
+    /* h1 { font-size: 2.2rem; } */ /* Cuidado para não sobrescrever header h1 */
+    /* h2 { font-size: 1.8rem; } */ /* Cuidado para não sobrescrever .hero h2 e .about h2 */
+    .about h2 { font-size: 1.8rem; } /* Ajuste para LTSipRegular */
+    .about p { font-size: 0.95rem; } /* Ajuste para LTSipRegular */
+
+    h3 { font-size: 1.4rem; }
+
+    nav ul li { margin: 5px; }
+    nav ul li a { font-size: 0.9rem; }
+}
+
+
+/* --- START: Estilos para o Botão de Mute --- */
+.mute-button {
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    z-index: 1001;
+    background-color: var(--primary-color);
+    color: #ffffff;
+    border: none;
+    border-radius: 50px;
+    padding: 10px 18px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    font-family: var(--font-headings-default); /* Poppins para o botão */
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    visibility: hidden;
+    transform: scale(0.8) translateY(10px);
+    transition: opacity var(--transition-speed) ease-in-out,
+                visibility 0s linear var(--transition-speed),
+                transform var(--transition-speed) ease-in-out,
+                background-color var(--transition-speed) ease;
+}
+
+.mute-button.visible {
+    opacity: 0.9;
+    visibility: visible;
+    transform: scale(1) translateY(0);
+    transition-delay: 0s;
+    transition: opacity var(--transition-speed) ease-in-out,
+                visibility 0s linear 0s,
+                transform var(--transition-speed) ease-in-out,
+                background-color var(--transition-speed) ease;
+}
+
+.mute-button:hover {
+    background-color: var(--primary-hover-color);
+    opacity: 1;
+    transform: scale(1.05);
+}
+/* --- END: Estilos para o Botão de Mute --- */
+
+/* --- END OF FILE style.css --- */

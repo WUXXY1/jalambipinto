@@ -1,0 +1,203 @@
+/* --- START OF FILE movie-detail.css --- */
+
+/* Estilos para as páginas de detalhes dos filmes */
+
+.movie-detail {
+    padding: 60px 0; /* Reduzido padding superior pois o header já tem */
+    background-color: var(--dark-bg);
+}
+
+.movie-detail-content {
+    display: grid;
+    grid-template-columns: 300px 1fr; /* Largura fixa para poster, restante para info */
+    gap: 50px; /* Aumentado gap */
+}
+
+.movie-poster {
+    position: sticky; /* Mantém o poster visível ao rolar */
+    top: 100px; /* Distância do topo após o header sticky */
+    align-self: start; /* Alinha ao topo do grid cell */
+}
+
+.movie-poster img {
+    width: 100%;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+}
+.movie-poster img:hover {
+    transform: scale(1.03);
+    box-shadow: var(--box-shadow-hover);
+}
+
+
+.movie-info-detail h2 { /* Título do Filme */
+    font-size: 2.8rem; /* Aumentado */
+    color: #fff; /* Branco para destaque */
+    margin-bottom: 25px;
+    line-height: 1.2;
+}
+
+.movie-meta {
+    display: flex;
+    flex-wrap: wrap; /* Permite quebra de linha se muitos itens */
+    gap: 15px; /* Aumentado gap */
+    margin-bottom: 35px; /* Aumentada margem */
+}
+
+.movie-meta span {
+    background-color: var(--card-bg); /* Mesmo fundo dos cards */
+    padding: 8px 15px; /* Mais padding */
+    border-radius: 20px; /* Mais arredondado para parecer "tag" */
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-muted-color);
+    border: 1px solid var(--border-color);
+}
+
+.movie-production,
+.movie-synopsis,
+.movie-cast,
+.movie-trailer,
+.movie-gallery {
+    margin-bottom: 40px;
+}
+
+.movie-production p {
+    font-size: 1rem;
+    color: var(--text-color); /* Texto principal */
+}
+.movie-production p strong {
+    color: var(--primary-color);
+}
+
+
+.movie-synopsis h3,
+.movie-cast h3,
+.movie-trailer h3,
+.movie-gallery h3 {
+    color: var(--primary-color);
+    font-size: 1.8rem;
+    margin-bottom: 20px; /* Aumentada margem */
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--border-color); /* Borda mais sutil */
+}
+
+.movie-synopsis p {
+    margin-bottom: 18px;
+    line-height: 1.8;
+    font-size: 1.05rem; /* Ligeiramente maior */
+    color: var(--text-color);
+}
+
+.movie-cast ul {
+    list-style: none; /* Removido disc padrão */
+    padding-left: 0;
+}
+
+.movie-cast ul li {
+    margin-bottom: 12px;
+    font-size: 1.05rem;
+    color: var(--text-color);
+    padding-left: 20px; /* Espaço para o marcador customizado */
+    position: relative;
+}
+
+.movie-cast ul li::before { /* Marcador customizado */
+    content: "•"; /* Ou "–", "›" etc. */
+    color: var(--primary-color);
+    font-weight: bold;
+    display: inline-block;
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+.trailer-placeholder,
+.gallery-image-placeholder {
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    padding: 50px; /* Mais padding */
+    text-align: center;
+    margin-bottom: 20px;
+    border: 1px dashed var(--border-color); /* Borda tracejada */
+}
+
+.trailer-placeholder p,
+.gallery-image-placeholder p {
+    font-size: 1.1rem; /* Ajustado */
+    color: var(--text-muted-color);
+}
+.trailer-placeholder .loader { /* Estilo para o loader dentro do placeholder */
+    margin: 0 auto; /* Centralizar se for o único conteúdo */
+}
+video { /* Para o trailer quando estiver presente */
+    max-width: 100%;
+    border-radius: var(--border-radius);
+    outline: none;
+}
+
+.back-button {
+    margin-top: 40px;
+}
+
+.back-button .btn {
+    font-size: 1rem; /* Ajustado */
+    padding: 12px 30px;
+}
+
+/* Filmes relacionados */
+.related-movies {
+    padding: 70px 0;
+    background-color: var(--card-bg); /* Mesmo fundo de .about */
+}
+
+.related-movies h2 { /* Título "Filmes Relacionados" */
+    text-align: center;
+    margin-bottom: 50px;
+    font-size: 2.2rem; /* Ajustado */
+    color: var(--primary-color);
+}
+
+.related-movies-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); /* Usar mesmo minmax dos cards principais */
+    gap: 35px; /* Mesmo gap */
+    max-width: 100%; /* Permitir que ocupe toda a largura do container */
+    /* Remover margin: 0 auto se a section já tem container */
+}
+/* Os cards em .related-movies-grid usarão o estilo de .movie-card do style.css */
+
+
+/* Responsividade */
+@media screen and (max-width: 992px) {
+    .movie-detail-content {
+        grid-template-columns: 1fr; /* Empilhar em telas menores */
+    }
+
+    .movie-poster {
+        position: relative; /* Volta ao fluxo normal */
+        top: 0;
+        max-width: 350px; /* Limitar largura do poster */
+        margin: 0 auto 40px; /* Centralizar e adicionar margem inferior */
+    }
+    .movie-info-detail h2 { font-size: 2.5rem; }
+}
+
+@media screen and (max-width: 768px) {
+    .movie-info-detail h2 { font-size: 2.2rem; }
+    .movie-meta { gap: 10px; }
+    .movie-meta span { padding: 6px 12px; font-size: 0.8rem; }
+    .related-movies-grid { grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 25px;}
+    .trailer-placeholder, .gallery-image-placeholder { padding: 30px; }
+}
+
+@media screen and (max-width: 480px) {
+    .movie-detail-content { gap: 30px; }
+    .movie-info-detail h2 { font-size: 1.8rem; }
+    .movie-synopsis h3, .movie-cast h3, .movie-trailer h3, .movie-gallery h3 { font-size: 1.5rem; }
+    .related-movies-grid { grid-template-columns: 1fr; } /* Uma coluna */
+    .movie-synopsis p, .movie-cast ul li { font-size: 0.95rem; }
+}
+
+/* --- END OF FILE movie-detail.css --- */
